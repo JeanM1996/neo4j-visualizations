@@ -9,7 +9,7 @@ var getQueryString = function ( field, url ) {
 var rawurl = getQueryString("cyperurl") || "http://hobby-cinpcmhbgmcbgbkeddkomdpl.dbs.graphenedb.com:24789";
 
 var cypherurl = rawurl + "/db/data/transaction/commit";
-alert(cypherurl);
+//alert(cypherurl);
 var cypheruid = getQueryString("cyperuid") || getQueryString("cyperusr") || "app78358662-9L8qxg";
 var cypherpwd = getQueryString("cyperpwd") || getQueryString("cyperusr") || "b.grELhdtxmu17.EgTwMT2CR8gp3pJ1";
 
