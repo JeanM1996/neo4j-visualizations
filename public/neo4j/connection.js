@@ -6,7 +6,10 @@ var getQueryString = function ( field, url ) {
     return string ? string[1] : null;
 };
 
-var cypherurl = getQueryString("cyperurl") || "http://hobby-cinpcmhbgmcbgbkeddkomdpl.dbs.graphenedb.com:24789/db/data/transaction/commit";
+var rawurl = getQueryString("cyperurl") || "http://hobby-cinpcmhbgmcbgbkeddkomdpl.dbs.graphenedb.com:24789";
+
+var cypherurl = rawurl + "/db/data/transaction/commit";
+alert(cypherurl);
 var cypheruid = getQueryString("cyperuid") || getQueryString("cyperusr") || "app78358662-9L8qxg";
 var cypherpwd = getQueryString("cyperpwd") || getQueryString("cyperusr") || "b.grELhdtxmu17.EgTwMT2CR8gp3pJ1";
 
