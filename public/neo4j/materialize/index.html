@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>
+    <!--<link type="text/css" rel="stylesheet" href="css/index.css" media="screen,projection"/>-->
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+
+    <style>
+        #popoto-graph {
+            height: 500px;
+        }
+
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        nav.top-nav {
+            height: 122px;
+            box-shadow: none;
+        }
+
+        nav.top-nav a.page-title {
+            line-height: 122px;
+            font-size: 48px;
+        }
+
+        body {
+            background-color: #fcfcfc;
+        }
+
+        .ppt-div-cypher {
+            background-color: #22252a;
+            border-radius: 5px 5px;
+            padding: 18px;
+        }
+
+        .ppt-div-results {
+            background-color: #22252a;
+            padding: 5px;
+            border-radius: 5px 5px;
+        }
+
+        .ppt-result {
+            color: #fff;
+        }
+
+        footer.page-footer {
+            padding-bottom: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav class="top-nav">
+    <div class="container">
+        <div class="nav-wrapper"><a class="page-title">Popoto.js</a></div>
+    </div>
+</nav>
+
+<div class="container">
+    <ul class="collapsible  popout" data-collapsible="expandable">
+        <li class="active">
+            <div class="collapsible-header active"><i class="material-icons">timeline</i>Graph</div>
+            <div class="collapsible-body" style="display: block;">
+                <div id="popoto-graph" class="ppt-div-graph">
+                </div>
+            </div>
+        </li>
+        <li class="active">
+            <div class="collapsible-header active"><i class="material-icons">search</i>Query</div>
+            <div class="collapsible-body" style="display: block;">
+                <div id="popoto-cypher" class="ppt-div-cypher center-align">
+
+                </div>
+            </div>
+        </li>
+        <li class="active">
+            <div class="collapsible-header active"><i class="material-icons">view_quilt</i>Results <span
+                    id="result-total-count" class="ppt-count"></span></div>
+            <div class="collapsible-body">
+                <div class="ppt-div-results">
+                    <div class="ppt-div-results col s12" id="popoto-results">
+
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<footer class="page-footer">
+    <div class="container center-align">
+        <button id="more-results-button" class="btn waves-effect waves-light red lighten-3" type="submit" name="action"
+                alt="More Results">More
+            Results
+        </button>
+    </div>
+</footer>
+
+
+<!--Import jQuery before materialize.js-->
+<script type="text/javascript" src="../../js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="js/materialize.js"></script>
+<script src="../material/image-loader.js" charset="utf-8"></script>
+
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.js" charset="utf-8"></script>
+<script src="../connection.js"></script>
+<script>
+    /**
+     * URL used to access Neo4j REST API to execute queries.
+     * Update this parameter to your running server instance.
+     *
+     * For more information on Neo4J REST API the documentation is available here: http://neo4j.com/docs/stable/rest-api-cypher.html
+     */
+    // popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+    //popoto.rest.CYPHER_URL = "http://localhost:7474/db/data/transaction/commit";
+
+    /**
+     * Add this authorization property if your Neo4j server uses basic HTTP authentication.
+     * The value of this property must be "Basic <payload>", where "payload" is a base64 encoded string of "username:password".
+     *
+     * "btoa" is a JavaScript function that can be used to encode the user and password value in base64 but it is recommended to directly use the Base64 value.
+     *
+     *  For example Base64 encoded value of "neo4j:password" is "bmVvNGo6cGFzc3dvcmQ="
+     */
+    // popoto.rest.AUTHORIZATION = "Basic " + btoa("neo4j:password");
+
+
+    /**
+     * Define the Label provider you need for your application.
+     * This configuration is mandatory and should contain at least all the labels you could find in your graph model.
+     *
+     * In this version only nodes with a label are supported.
+     *
+     * By default If no attributes are specified Neo4j internal ID will be used.
+     * These label provider configuration can be used to customize the node display in the graph.
+     * See www.popotojs.com or example for more details on available configuration options.
+     */
+    popoto.provider.nodeProviders = {
+        "Person": {
+            "returnAttributes": ["id", "name", "born"],
+            "constraintAttribute": "id",
+            "schema": {
+                label: "Person",
+                rel: [
+                    {
+                        label: "ACTED_IN",
+                        node: {
+                            label: "Movie",
+                            rel: [
+                                {
+                                    label: "HAS_GENRE",
+                                    node: {
+                                        label: "Genre"
+                                    }
+                                },
+                                {
+                                    label: "HAS_KEYWORD",
+                                    node: {
+                                        label: "Keyword"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        label: "DIRECTED",
+                        node: {
+                            label: "Movie",
+                            rel: [
+                                {
+                                    label: "HAS_GENRE",
+                                    node: {
+                                        label: "Genre"
+                                    }
+                                },
+                                {
+                                    label: "HAS_KEYWORD",
+                                    node: {
+                                        label: "Keyword"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        label: "PRODUCED",
+                        node: {
+                            label: "Movie",
+                            rel: [
+                                {
+                                    label: "HAS_GENRE",
+                                    node: {
+                                        label: "Genre"
+                                    }
+                                },
+                                {
+                                    label: "HAS_KEYWORD",
+                                    node: {
+                                        label: "Keyword"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        label: "WRITER_OF",
+                        node: {
+                            label: "Movie",
+                            rel: [
+                                {
+                                    label: "HAS_GENRE",
+                                    node: {
+                                        label: "Genre"
+                                    }
+                                },
+                                {
+                                    label: "HAS_KEYWORD",
+                                    node: {
+                                        label: "Keyword"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.IMAGE;
+            },
+            "getTextValue": function (node) {
+                var text;
+                var displayAttr = "name";
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    text = "" + node.attributes[displayAttr];
+                } else {
+                    if (node.value === undefined) {
+                        text = node.label;
+                    } else {
+                        text = "" + node.value.attributes[displayAttr];
+                    }
+                }
+
+                // Text is truncated
+                return text.substring(0, popoto.graph.node.NODE_MAX_CHARS);
+            },
+            "getImagePath": function (node) {
+                return imageLoader.getImagePath(node, "name");
+            },
+            "getImageWidth": function (node) {
+                return 100;
+            },
+            "getImageHeight": function (node) {
+                return 150;
+            },
+            "displayResults": function (pResultElmt) {
+
+                // Here D3.js mechanisms is used to generate HTML code.
+                // By default Popoto.js generates a <p> element for each result.
+                // pResultElmt parameter is the <p> element selected with D3.js
+
+                var div1 = pResultElmt.append("div").attr("style", "display: flex;");
+                div1.append("img")
+                    .attr("src", function (result) {
+                        return imageLoader.getImage(result.attributes.name, "Person");
+                    });
+
+                var div = div1.append("div").attr("style", "margin-left: 20px;");
+                // An <h3> element containing the person name
+                div.append("h3")
+                    .text(function (result) {
+                        return result.attributes.name;
+                    });
+
+                // A <span> element with the computed age from born attribute
+                div.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.born;
+                }).append("span").text(function (result) {
+                    return "Born: " + result.attributes.born;
+                });
+
+            },
+            "displayResults2": function (pResultElmt) {
+                pResultElmt.classed("card blue-grey darken-1", true);
+                /*
+                 <div class="card-image waves-effect waves-block waves-light">
+                 <img class="activator" src="images/office.jpg">
+                 </div>
+
+                 <div class="card-content white-text">
+                 <span class="card-title">Card Title</span>
+                 <p>I am a very simple card. I am good at containing small bits of information.
+                 I am convenient because I require little markup to use effectively.</p>
+                 </div>
+
+                 <div class="card-action">
+                 <a href="#">This is a link</a>
+                 <a href="#">This is a link</a>
+                 </div>
+                 */
+
+                var div1 = pResultElmt.append("div").attr("class", "card-image waves-effect waves-block waves-light");
+                div1.append("img")
+                    .attr("class", "activator")
+                    //                    .attr("height", "100")
+                    //                    .attr("width", "68")
+                    .attr("src", function (result) {
+                        return "persons/" + result.attributes.name + ".jpg";
+                    });
+
+                var div = pResultElmt.append("div").attr("class", "card-content white-text");
+                div.append("span")
+                    .attr("class", "card-title")
+                    .text(function (result) {
+                        return result.attributes.name;
+                    });
+                div.append("p")
+                    .text(function (result) {
+                        return "Born" + result.attributes.born;
+                    });
+
+//                // A <span> element with the computed age from born attribute
+//                div.filter(function (result) {
+//                    // Filter on attribute having born attribute value
+//                }).append("span").text(function (result) {
+//                    return "Age: " + (new Date().getFullYear() - result.attributes.born);
+//                });
+
+            }
+        },
+        "Movie": {
+            "returnAttributes": ["id", "duration", "rated", "summary", "tagline", "title", "poster_image"],
+            "constraintAttribute": "id",
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.IMAGE;
+            },
+            "getTextValue": function (node) {
+                var text;
+                var displayAttr = "title";
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    text = "" + node.attributes[displayAttr];
+                } else {
+                    if (node.value === undefined) {
+                        text = node.label;
+                    } else {
+                        text = "" + node.value.attributes[displayAttr];
+                    }
+                }
+
+                // Text is truncated
+                return text.substring(0, popoto.graph.node.NODE_MAX_CHARS);
+            },
+            "getImagePath": function (node) {
+                return imageLoader.getImagePath(node, "title");
+            },
+            "getImageWidth": function (node) {
+                return 100;
+            },
+            "getImageHeight": function (node) {
+                return 150;
+            },
+            "displayResults": function (pResultElmt) {
+
+                // Here D3.js mechanisms is used to generate HTML code.
+                // By default Popoto.js generates a <p> element for each result.
+                // pResultElmt parameter is the <p> element selected with D3.js
+
+                var div1 = pResultElmt.append("div").attr("style", "display: flex;");
+                div1.append("img")
+                    .attr("src", function (result) {
+                        return imageLoader.getImage(result.attributes.title, "Movie");
+                    });
+
+                var div = div1.append("div").attr("style", "margin-left: 20px;");
+                // An <h3> element containing the person name
+                div.append("h3")
+                    .text(function (result) {
+                        return result.attributes.title;
+                    });
+
+                // A <span> element with the computed age from born attribute
+                div.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.born;
+                }).append("span").text(function (result) {
+                    return result.attributes.summary;
+                });
+
+            }
+        },
+        "Genre": {
+            "returnAttributes": ["id", "name"],
+            "constraintAttribute": "id",
+            "getTextValue": function (node) {
+                var text;
+                var displayAttr = "name";
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    text = "" + node.attributes[displayAttr];
+                } else {
+                    if (node.value === undefined) {
+                        text = node.label;
+                    } else {
+                        text = "" + node.value.attributes[displayAttr];
+                    }
+                }
+
+                // Text is truncated
+                return text.substring(0, popoto.graph.node.NODE_MAX_CHARS);
+            }
+        },
+        "Keyword": {
+            "returnAttributes": ["id", "name"],
+            "constraintAttribute": "id",
+            "getTextValue": function (node) {
+                var text;
+                var displayAttr = "name";
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    text = "" + node.attributes[displayAttr];
+                } else {
+                    if (node.value === undefined) {
+                        text = node.label;
+                    } else {
+                        text = "" + node.value.attributes[displayAttr];
+                    }
+                }
+
+                // Text is truncated
+                return text.substring(0, popoto.graph.node.NODE_MAX_CHARS);
+            }
+        }
+    };
+
+    /**
+     * Here a listener is used to retrieve the total results count and update the page accordingly.
+     * This listener will be called on every graph modification.
+     */
+    popoto.result.onTotalResultCount(function (count) {
+        document.getElementById("result-total-count").innerHTML = "(" + count + ")";
+    });
+
+    /**
+     * The number of results returned can be changed with the following parameter.
+     * Default value is 100.
+     *
+     * Note that in this current version no pagination mechanism is available in displayed results
+     */
+    popoto.query.RESULTS_PAGE_SIZE = 1000;
+
+
+    /**
+     * For this version, popoto.js has been generated with debug traces you can activate with the following properties:
+     * The value can be one in DEBUG, INFO, WARN, ERROR, NONE.
+     *
+     * With INFO level all the executed cypher query can be seen in the navigator console.
+     * Default is NONE
+     */
+//    popoto.logger.LEVEL = popoto.logger.LogLevels.INFO;
+
+    d3.select("#more-results-button").on("click", function (d) {
+        popoto.query.RESULTS_PAGE_SIZE = popoto.query.RESULTS_PAGE_SIZE + 5;
+        popoto.result.hasChanged = true;
+        console.log(popoto.query.RESULTS_PAGE_SIZE);
+        popoto.result.updateResults();
+    });
+
+
+    /**
+     * Start popoto.js generation.
+     * The function requires the label to use as root element in the graph.
+     */
+    imageLoader.loadData().then(function () {
+        popoto.start("Person");
+    });
+</script>
+
+</body>
+</html>

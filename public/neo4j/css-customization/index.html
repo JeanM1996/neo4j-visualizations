@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <script src="../../js/analytics.js"></script>
+    <style>
+        body {
+            font: 13px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #d2d5da;
+            color: #333;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            width: 136px;
+            bottom: 0;
+            color: #bcc0c9;
+            background-color: #30333a;
+            text-shadow: rgba(0, 0, 0, .4) 0 1px 0;
+            overflow-y: auto;
+            height: 100%;
+            padding: 0 0 0 0;
+        }
+
+        .drawer h5 {
+            padding: 0 0 0 10px;
+            line-height: 39px;
+            font-size: 13px;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 12px;
+            margin-top: 0;
+            border-bottom: 1px solid #424650;
+        }
+
+        .main {
+            position: absolute;
+            overflow: hidden;
+            top: 0;
+            bottom: 0;
+            left: 136px;
+            right: 0;
+            z-index: 10;
+            background-color: #d2d5da;
+        }
+
+        .frame {
+            height: 550px;
+            background-color: #F8F9FB;
+            position: relative;
+            top: 0;
+            opacity: 1;
+            max-height: 10000px;
+            border-bottom: 1px solid #e6e9ef;
+            overflow: hidden;
+        }
+
+        .frame:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        .ppt-taxo-tag {
+            display: none;
+        }
+
+        .ppt-taxo-ul {
+            list-style-type: none;
+            display: block;
+            vertical-align: top;
+            padding-left: 10px;
+            margin: 0;
+        }
+
+        .ppt-node-ellipse.root {
+            fill: #68BDF6;
+            stroke: #5CA8DB;
+            stroke-width: 2px;
+        }
+
+        .ppt-node-ellipse.choose {
+            fill: #6DCE9E;
+            stroke: #60B58B;
+            stroke-width: 2px;
+        }
+
+        .ppt-node-ellipse.value {
+            fill: #FF756E;
+            stroke: #E06760;
+            stroke-width: 2px;
+        }
+
+        .ppt-node-ellipse.selected-value {
+            fill: #f0b017;
+            stroke: #d1a209;
+            stroke-width: 2px;
+        }
+
+        .ppt-node-ellipse.selected-root-value {
+            fill: #8f5bcc;
+            stroke: #6f57ad;
+            stroke-width: 2px;
+        }
+
+        .ppt-node-ellipse.group {
+            fill: #A5ABB6;
+            stroke: #9AA1AC;
+            stroke-width: 2px;
+        }
+
+        .ppt-node-text-root {
+            font-size: 10px;
+            fill: #ffffff;
+        }
+
+        .ppt-node-text-choose {
+            font-size: 10px;
+            fill: #ffffff;
+        }
+
+        .ppt-node-text-value {
+            font-size: 10px;
+            fill: #ffffff;
+        }
+
+        .ppt-node-text-group {
+            font-size: 10px;
+            fill: #ffffff;
+        }
+
+        .ppt-link-relation {
+            stroke: #A5ABB6;
+            stroke-width: 1px;
+            stroke-dasharray: 500;
+        }
+
+        .ppt-link-value {
+            stroke: #A5ABB6;
+            stroke-width: 1px;
+            stroke-dasharray: 500;
+        }
+
+        .ppt-link-hover {
+            stroke: #6ac6ff;
+        }
+
+        .ppt-link-text-relation {
+            fill: #000000;
+            font-size: 10px;
+        }
+
+        .ppt-link-text-relation.value {
+            fill: #000000;
+            font-size: 10px;
+        }
+
+        .ppt-link-text-value {
+            fill: #525863;
+        }
+
+        .ppt-larrow {
+            stroke: #9AA1AC;
+            stroke-width: 2px;
+            fill: #A5ABB6;
+        }
+
+        .ppt-rarrow {
+            stroke: #9AA1AC;
+            stroke-width: 2px;
+            fill: #A5ABB6;
+        }
+
+        .ppt-larrow.enabled {
+            fill: #68BDF6;
+            stroke: #5CA8DB;
+        }
+
+        .ppt-rarrow.enabled {
+            fill: #68BDF6;
+            stroke: #5CA8DB;
+        }
+
+        .ppt-count-box.value {
+            fill: #FB95AF;
+            stroke: #E0849B;
+            stroke-width: 2px;
+        }
+
+        .ppt-count-box.root {
+            fill: #68BDF6;
+            stroke: #5CA8DB;
+            stroke-width: 2px;
+        }
+
+        .code-bar {
+            background: #fff;
+            color: #848790;
+            line-height: 39px;
+            padding-left: 10px;
+            position: relative;
+            border-bottom: 1px solid #e6e9ef;
+        }
+
+        .ppt-span, .ppt-span-link {
+            color: #848790;
+        }
+
+        .notice-bar {
+            color: #fff;
+            background-color: #0e78b4;
+            height: 39px;
+            line-height: 39px;
+            padding-left: 10px;
+            position: relative;
+            border-bottom: 1px solid #e6e9ef;
+        }
+
+        .prompt {
+            margin-right: 5px;
+            opacity: .5;
+            -ms-filter: "alpha(Opacity=50)";
+            filter: alpha(opacity=50);
+            font-weight: 700;
+        }
+
+        .ppt-node-background-circle {
+            fill: #fdcc59;
+        }
+
+        .table-holder {
+            max-height: 464px;
+            min-height: 151px;
+            overflow: auto;
+            background: #fff;
+        }
+
+        .ppt-result {
+            background-color: #fff;
+            border-bottom: 1px solid #ebecec;
+            vertical-align: top;
+            line-height: 26px;
+            padding: 0 16px;
+        }
+
+        .ppt-result:hover {
+            background-color: #fff;
+        }
+
+        table.json-object {
+            background-color: #eee;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            margin: 20px 10px;
+        }
+
+        table.json-object tbody tr td, table.json-object tbody tr th {
+            border-bottom: 0;
+            color: #666;
+            line-height: 26px;
+            padding: 2px 10px;
+            max-width: 320px;
+        }
+
+        ul {
+            list-style-type: none;
+            display: block;
+            vertical-align: top; /* | top | bottom */
+            padding: 0 0 0 10px;
+            margin: 0;
+        }
+
+        li {
+            text-align: center;
+            display: block;
+            width: 100px;
+            color: #30333a;
+            background-color: #9195a0;
+            text-shadow: none;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            margin-top: 6px;
+            padding: 4px 7px 4px 9px;
+            border-radius: 20px;
+        }
+
+        li:hover {
+            background-color: #fff;
+        }
+
+        li img {
+            display: none;
+            vertical-align: middle; /* | top | bottom */
+        }
+
+        .ppt-count {
+            cursor: pointer;
+            color: #30333a;
+        }
+
+        .ppt-label:hover {
+            color: #30333a;
+        }
+
+        .ppt-node-background-circle.disabled {
+            fill: #c4c4c4;
+        }
+
+        .ppt-link-relation.disabled {
+            stroke: #D3D3D3;
+            stroke-width: 1px;
+            stroke-dasharray: 500;
+        }
+
+        .ppt-link-text-relation.disabled {
+            fill: #d3d3d3;
+            font-size: 10px;
+        }
+
+        .ppt-count-box.value.disabled {
+            fill: #D3D3D3;
+            stroke: #c7c7c7;
+            stroke-width: 2px;
+            opacity: 0.8;
+        }
+
+        .ppt-node-ellipse.choose.disabled {
+            fill: #D3D3D3;
+            stroke: #c7c7c7;
+        }
+
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="popoto-taxonomy" class="drawer">
+    <h5>Node labels</h5>
+    <!-- Label/taxonomy filter will be generated here -->
+</div>
+<div id="main" class="main">
+    <div class="notice-bar">
+        Popoto.js CSS customization example using <a href="http://neo4j.com/" style="color: #0ebcff;">Neo4j</a> like web browser CSS style.
+    </div>
+    <div class="code-bar">
+        Tips: Right click on a node to retrieve the relations. Use left click to expand and select a value. Right click can also be used to remove a selection.
+    </div>
+    <div class="code-bar" id="popoto-cypher">
+    </div>
+    <div class="frame" id="popoto-graph">
+        <!-- Graph will be generated here-->
+    </div>
+    <div class="code-bar" id="count">
+        Returned <span id="rescount">0</span> rows
+    </div>
+    <div id="popoto-results" class="table-holder">
+        <!-- Results will be generated here -->
+    </div>
+</div>
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script>
+    // Change ellipses dimension to have circles
+    popoto.graph.node.ELLIPSE_RX = 40;
+    popoto.graph.node.ELLIPSE_RY = 40;
+    popoto.graph.node.TEXT_Y = 6;
+    popoto.graph.LINK_DISTANCE = 100;
+    popoto.graph.node.BACK_CIRCLE_R = 48;
+
+    // Disable toggle taxonomy tool button
+    popoto.tools.TOGGLE_TAXONOMY = false;
+
+    popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+
+    popoto.graph.node.NODE_MAX_CHARS = 13;
+
+    // Define the list of label provider to customize the graph behavior:
+    popoto.provider.nodeProviders = {
+        "Movie": {
+            "returnAttributes": ["title", "released", "tagline"],
+            "constraintAttribute": "title",
+            "displayResults": function (pResultElmt) {
+                var tbody = pResultElmt.append("table").attr("class", "json-object").append("tbody");
+                var titletr = tbody.append("tr");
+                titletr.append("th").text("title");
+                titletr.append("td").text(function (result) {
+                    return result.attributes.title;
+                });
+
+                var releasetr = tbody.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.release;
+                }).append("tr");
+                releasetr.append("th").text("release");
+                releasetr.append("td").text(function (result) {
+                    return result.attributes.release;
+                });
+
+                var taglineTr = tbody.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.tagline;
+                }).append("tr");
+                taglineTr.append("th").text("tagline");
+                taglineTr.append("td").text(function (result) {
+                    return result.attributes.tagline;
+                });
+            }
+        },
+        "Person": {
+            "returnAttributes": ["name", "born"],
+            "constraintAttribute": "name",
+            "displayResults": function (pResultElmt) {
+
+                var tbody = pResultElmt.append("table").attr("class", "json-object").append("tbody");
+                var nametr = tbody.append("tr");
+                nametr.append("th").text("name");
+                nametr.append("td").text(function (result) {
+                    return result.attributes.name;
+                });
+
+                var borntr = tbody.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.born;
+                }).append("tr");
+                borntr.append("th").text("born");
+                borntr.append("td").text(function (result) {
+                    return result.attributes.born;
+                });
+            }
+        }
+    };
+
+    // Define the label provider used to customize the link displayed text:
+    popoto.provider.linkProvider = {
+
+        // Customize the text displayed on links:
+        "getLinkTextValue": function (link) {
+
+            // The links labels are just changed in lower case in this example.
+            // But it is possible to use a localization mechanism here to replace values.
+            if (link.type === popoto.graph.link.LinkTypes.RELATION) {
+                switch (link.label) {
+                    case "ACTED_IN":
+                        return "Acted in";
+                    case "DIRECTED":
+                        return "Directed";
+                    case "PRODUCED":
+                        return "Produced";
+                    case "WROTE":
+                        return "Wrote";
+                    case "FOLLOWS":
+                        return "Follows";
+                    case "REVIEWED":
+                        return "Reviewed";
+                    default :
+                        return "Unexpected relation"
+                }
+            }
+        }
+    };
+
+    // Change the number of displayed results:
+    popoto.query.RESULTS_PAGE_SIZE = 25;
+
+    // Add a listener on returned result count to update count in page
+    popoto.result.onTotalResultCount(function (count) {
+        d3.select("#rescount").text(function (d) {
+            return "" + count;
+        })
+    });
+
+    // Start the generation using parameter as root label of the query.
+    popoto.start("Person");
+
+</script>
+</body>
+</html>

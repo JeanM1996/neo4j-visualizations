@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <script src="../../js/analytics.js"></script>
+    <style>
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="ppt-body">
+
+<header class="ppt-header"></header>
+
+<section class="ppt-section-main" style="height: 700px">
+    <div class="ppt-section-header" style="height: 150px; line-height: 45px;">
+        <span class="ppt-header-span">Neo4j movie graph -</span> Predefined constraints modifiable with inputs
+
+        <form>
+            <label>
+                <input id="constraint" type="text" style="width: 500px;" value="$identifier.born > 1967">
+            </label>
+            <input id="filter-button" type="button" value="Use this filter">
+            <br>
+            <label>
+                <input id="constraint2" type="text" style="width: 500px;" value="$identifier.name IN [&quot;Patricia Clarkson&quot;, &quot;Sam Rockwell&quot;, &quot;Gary Sinise&quot;, &quot;Michael Clarke Duncan&quot;, &quot;Bonnie Hunt&quot;, &quot;David Morse&quot;, &quot;Tom Hanks&quot;, &quot;James Cromwell&quot;]">
+            </label>
+            <input id="filter-button2" type="button" value="Use this filter">
+        </form>
+    </div>
+
+    <!-- By default the graph is generated on the HTML element with ID "popoto-graph"
+     If needed this id can be changed with property "popoto.graph.containerId" -->
+
+    <div class="ppt-container-graph">
+        <nav id="popoto-taxonomy" class="ppt-taxo-nav">
+            <!-- Label/taxonomy filter will be generated here -->
+        </nav>
+        <div id="popoto-graph" class="ppt-div-graph">
+            <!-- Graph will be generated here-->
+        </div>
+    </div>
+
+    <!-- By default the query viewer is generated on the HTML element with ID "popoto-query"
+     If needed this id can be changed with property "popoto.query.containerId" -->
+
+    <div id="popoto-query" class="ppt-container-query">
+        <!-- Query viewer is generated here -->
+    </div>
+
+    <!-- Cypher query viewer has been partially disabled for this alpha release and only display the query as text if enabled -->
+    <div id="popoto-cypher" class="ppt-container-cypher">
+    </div>
+
+    <!-- Add a header with total number of results count -->
+    <div class="ppt-section-header">
+        RESULTS <span id="rescount" class="ppt-count"></span>
+    </div>
+
+    <div id="popoto-results" class="ppt-container-results">
+        <!-- Results are generated here -->
+    </div>
+
+</section>
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script>
+
+    var personPredefinedConstraints = [];
+
+    d3.select("#filter-button").on("click", function (d) {
+        var constraint = d3.select("#constraint")[0][0].value;
+
+        personPredefinedConstraints = [constraint];
+
+        // Recreate taxonomies panel
+        d3.select("#" + popoto.taxonomy.containerId).selectAll("ul").data([]).exit().remove();
+        popoto.taxonomy.createTaxonomyPanel();
+
+        popoto.tools.reset();
+    });
+
+    d3.select("#filter-button2").on("click", function (d) {
+        var constraint = d3.select("#constraint2")[0][0].value;
+
+        personPredefinedConstraints = [constraint];
+
+        // Recreate taxonomies panel
+        d3.select("#" + popoto.taxonomy.containerId).selectAll("ul").data([]).exit().remove();
+        popoto.taxonomy.createTaxonomyPanel();
+
+        popoto.tools.reset();
+    });
+
+    // logger level is set to INFO to see generated Cypher queries in console logs
+    popoto.logger.LEVEL = popoto.logger.LogLevels.INFO;
+
+    popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+
+    // Define the list of label provider to customize the graph behavior:
+    // Only two labels are used in Neo4j movie graph example: "Movie" and Person
+    popoto.provider.nodeProviders = {
+        "Movie": {
+            "returnAttributes": ["title", "released", "tagline"],
+            "constraintAttribute": "title",
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.IMAGE;
+            },
+            "getImagePath": function (node) {
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    return "movies/" + node.attributes.title.replace("/", " ") + ".jpg";
+                } else {
+                    if (node.value !== undefined) {
+                        return "movies/" + node.value.attributes.title.replace("/", " ") + ".jpg";
+                    } else {
+                        if (node.type === popoto.graph.node.NodeTypes.ROOT) {
+                            return "movies/movie_blue.svg";
+                        } else {
+                            if (node.count == 0) {
+                                return "movies/movie_disabled.svg";
+                            } else {
+                                return "movies/movie_green.svg";
+                            }
+                        }
+                    }
+                }
+            },
+            // Disable text on nodes as images are used instead.
+            "getIsTextDisplayed": function (node) {
+                return false;
+            }
+        },
+        "Person": {
+            "returnAttributes": ["name", "born"],
+            "constraintAttribute": "name",
+            // Return a predefined constraint that can be edited in the page.
+            "getPredefinedConstraints": function (node) {
+                return personPredefinedConstraints;
+            },
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.IMAGE;
+            },
+            "getImagePath": function (node) {
+                var path;
+
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    path = "persons/" + node.attributes.name + ".jpg";
+                } else {
+                    if (node.value !== undefined) {
+                        path = "persons/" + node.value.attributes.name + ".jpg";
+                    } else {
+                        if (node.type === popoto.graph.node.NodeTypes.ROOT) {
+                            path = "persons/person_blue.svg";
+                        } else {
+                            if (node.count == 0) {
+                                path = "persons/person_disabled.svg";
+                            } else {
+                                path = "persons/person_green.svg";
+                            }
+                        }
+                    }
+                }
+                return path;
+            },
+            // Disable text on nodes
+            "getIsTextDisplayed": function (node) {
+                return false;
+            },
+
+            // Customize result display for Person nodes:
+            "displayResults": function (pResultElmt) {
+
+                // Here D3.js mechanisms is used to generate HTML code.
+                // By default Popoto.js generates a <p> element for each result.
+                // pResultElmt parameter is the <p> element selected with D3.js
+
+                var div1 = pResultElmt.append("div").attr("style", "display: flex;");
+                div1.append("img")
+                        .attr("height", "100")
+                        .attr("width", "68")
+                        .attr("src", function (result) {
+                            return "persons/" + result.attributes.name + ".jpg";
+                        });
+
+                var div = div1.append("div").attr("style", "margin-left: 20px;");
+                // An <h3> element containing the person name
+                div.append("h3")
+                        .text(function (result) {
+                            return result.attributes.name;
+                        });
+
+                // A <span> element with the computed age from born attribute
+                div.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.born;
+                }).append("span").text(function (result) {
+                    return "Age: " + (new Date().getFullYear() - result.attributes.born);
+                });
+
+            }
+        }
+    };
+
+    // Define the label provider used to customize the link displayed text:
+    popoto.provider.linkProvider = {
+
+        // Customize the text displayed on links:
+        "getLinkTextValue": function (link) {
+
+            // The links labels are just changed in lower case in this example.
+            // But it is possible to use a localization mechanism here to replace values.
+            if (link.type === popoto.graph.link.LinkTypes.RELATION) {
+
+                if (link.source.label == "Person") {
+                    switch (link.label) {
+                        case "ACTED_IN":
+                            return "Acted in";
+                        case "DIRECTED":
+                            return "Directed";
+                        case "PRODUCED":
+                            return "Produced";
+                        case "WROTE":
+                            return "Wrote";
+                        case "FOLLOWS":
+                            return "Follows";
+                        case "REVIEWED":
+                            return "Reviewed";
+                        default :
+                            return "Unexpected relation"
+                    }
+                }
+
+                if (link.source.label == "Movie") {
+                    switch (link.label) {
+                        case "ACTED_IN":
+                            return "Actor";
+                        case "DIRECTED":
+                            return "Directed by";
+                        case "PRODUCED":
+                            return "Produced by";
+                        case "WROTE":
+                            return "Wrote by";
+                        case "FOLLOWS":
+                            return "Followed by";
+                        case "REVIEWED":
+                            return "Reviewed by";
+                        default :
+                            return "Unexpected relation"
+                    }
+                }
+
+            } else {
+                return popoto.provider.getSemanticValue(link.target);
+            }
+        }
+    };
+
+    // Change the number of displayed results:
+    popoto.query.RESULTS_PAGE_SIZE = 100;
+
+    // Add a listener on returned result count to update count in page
+    popoto.result.onTotalResultCount(function (count) {
+        d3.select("#rescount").text(function (d) {
+            return "(" + count + ")";
+        })
+    });
+
+    // Start the generation using parameter as root label of the query.
+    popoto.start("Person");
+
+</script>
+</body>
+</html>

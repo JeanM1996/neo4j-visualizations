@@ -1,0 +1,1 @@
+web: node --max-old-space-size=384 ./red.js --settings ./HardingPoint/HardingPointSettings.js

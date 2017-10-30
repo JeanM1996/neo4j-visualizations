@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <script src="../../js/analytics.js"></script>
+    <style>
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="ppt-body">
+
+<header class="ppt-header"></header>
+
+<section class="ppt-section-main" style="height: 700px">
+    <div class="ppt-section-header">
+        <span class="ppt-header-span">Neo4j movie graph -</span> Results example
+    </div>
+
+    <!-- By default the graph is generated on the HTML element with ID "popoto-graph"
+     If needed this id can be changed with property "popoto.graph.containerId" -->
+
+    <div id="popoto-graph" class="ppt-div-graph">
+        <!-- Graph is generated here-->
+    </div>
+
+    <!-- By default the query viewer is generated on the HTML element with ID "popoto-query"
+     If needed this id can be changed with property "popoto.query.containerId" -->
+
+    <div id="popoto-query" class="ppt-container-query">
+        <!-- Query viewer is generated here -->
+    </div>
+
+    <!-- Add a header with total number of results count -->
+    <div class="ppt-section-header">
+        RESULTS <span id="rescount" class="ppt-count"></span>
+    </div>
+
+    <div id="popoto-results" class="ppt-container-results">
+        <!-- Results are generated here -->
+    </div>
+
+</section>
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script src="../connection.js"></script>
+<script>
+
+    // popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+
+    // Define the list of label provider to customize the graph behavior:
+    // Only two labels are used in Neo4j movie graph example: "Movie" and "Person"
+    popoto.provider.nodeProviders = {
+        "Account": {
+            "returnAttributes": ["name"],
+            "constraintAttribute": "title"
+        },
+        "Contact": {
+            "returnAttributes": ["name"],
+            "constraintAttribute": "name",
+            // Customize result display for Person nodes:
+            "displayResults": function (pResultElmt) {
+
+                // Here D3.js mechanisms is used to generate HTML code.
+                // By default Popoto.js generates a <p> element for each result.
+                // pResultElmt parameter is the <p> element selected with D3.js
+                // So for "Person" result nodes two elements are generated:
+
+                // An <h3> element containing the person name
+                pResultElmt.append("h3")
+                        .text(function (result) {
+                            return result.attributes.name;
+                        });
+
+                // A <span> element with the computed age from born attribute
+                pResultElmt.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.born;
+                }).append("span").text(function (result) {
+                    return "Age: " + (new Date().getFullYear() - result.attributes.born);
+                });
+
+            }
+        }
+    };
+
+    // Define the label provider used to customize the link displayed text:
+    popoto.provider.linkProvider = {
+
+        // Customize the text displayed on links:
+        "getLinkTextValue": function (link) {
+
+            // The links labels are just changed in lower case in this example.
+            // But it is possible to use a localization mechanism here to replace values.
+            if (link.type === popoto.graph.link.LinkTypes.RELATION) {
+                switch (link.label) {
+                    case "ACTED_IN":
+                        return "Acted in";
+                    case "DIRECTED":
+                        return "Directed";
+                    case "PRODUCED":
+                        return "Produced";
+                    case "WROTE":
+                        return "Wrote";
+                    case "FOLLOWS":
+                        return "Follows";
+                    case "REVIEWED":
+                        return "Reviewed";
+                    default :
+                        return link.label"
+                }
+            } else { // Value links
+
+                // It is also possible to use data from link source or target nodes.
+                if (link.target.label == "Account") {
+                    return link.target.attributes.tagline;
+                }
+
+            }
+        }
+    };
+
+    // Change the number of displayed results:
+    popoto.query.RESULTS_PAGE_SIZE = 10;
+
+    // Add a listener on returned result count to update count in page
+    popoto.result.onTotalResultCount(function (count) {
+        d3.select("#rescount").text(function (d) {
+            return "(" + count + ")";
+        })
+    });
+
+    // Start the generation using parameter as root label of the query.
+    popoto.start("Account");
+
+</script>
+</body>
+</html>

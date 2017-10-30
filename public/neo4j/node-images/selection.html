@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <script src="../../js/analytics.js"></script>
+    <style>
+        .instanceSelection {
+            border-color: red;
+            border-width: 2px;
+            border-style: dashed;
+        }
+    </style>
+    <style>
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="ppt-body">
+
+<header class="ppt-header"></header>
+
+<section class="ppt-section-main" style="height: 700px">
+    <div class="ppt-section-header">
+        <span class="ppt-header-span">Neo4j movie graph -</span> Event customization example
+    </div>
+
+    <div class="ppt-container-graph">
+        <nav id="popoto-taxonomy" class="ppt-taxo-nav">
+            <!-- Label/taxonomy filter will be generated here -->
+        </nav>
+        <!-- Add clickable images which will update graph on these instances -->
+        <div id="instances" style="float: left; cursor: pointer">
+            <img height="100" width="68" src="persons/Tom%20Hanks.jpg" onclick="selectInstance('Person', {name:'Tom Hanks'})"><br>
+            <img height="100" width="68" src="persons/Keanu%20Reeves.jpg" onclick="selectInstance('Person', {name:'Keanu Reeves'})"><br>
+            <img height="100" width="67" src="movies/The%20Matrix.jpg" onclick="selectInstance('Movie', {title:'The Matrix'})"><br>
+            <img height="100" width="68" src="persons/Natalie%20Portman.jpg" onclick="selectInstance('Person', {name:'Natalie Portman'})"><br>
+            <img height="100" width="68" src="movies/V%20for%20Vendetta.jpg" onclick="selectInstance('Movie', {title:'V for Vendetta'})">
+        </div>
+        <div id="popoto-graph" class="ppt-div-graph">
+            <!-- Graph will be generated here-->
+        </div>
+    </div>
+
+    <div id="popoto-query" class="ppt-container-query">
+        <!-- Query viewer is generated here -->
+    </div>
+
+    <div id="popoto-cypher" class="ppt-container-query">
+        <!-- Cypher viewer is generated here -->
+    </div>
+
+    <div id="selection" class="ppt-container-query instanceSelection" style="display: none;">
+
+    </div>
+
+    <!-- Add a header with total number of results count -->
+    <div class="ppt-section-header">
+        RESULTS <span id="rescount" class="ppt-count"></span>
+    </div>
+
+    <div id="popoto-results" class="ppt-container-results">
+        <!-- Results are generated here -->
+    </div>
+
+</section>
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script>
+
+    popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+
+    // Global variable containing root instance if needed
+    // If set the graph will be initialised on an instance node
+    var instanceData;
+
+    /**
+     * Listener used when root node is added
+     * In this listener if instanceData is set root node is initialized with a value
+     * and set in immutable state.
+     *
+     * @param rootNode root node reference when graph is created.
+     */
+    var rootNodeListener = function (rootNode) {
+
+        // Only change root node data if instanceData is defined
+        if (instanceData) {
+
+            // Change root node type and label with instanceData
+            rootNode.value = {
+                type: popoto.graph.node.NodeTypes.VALUE,
+                label: instanceData.label
+            };
+
+            rootNode.value.attributes = instanceData.attributes;
+
+            // Set node as immutable, in this state the value cannot be deselected.
+            rootNode.immutable = true;
+        }
+    };
+
+    // Add rootNodeListener on NODE_ROOT_ADD event
+    popoto.graph.on(popoto.graph.Events.NODE_ROOT_ADD, rootNodeListener);
+
+    /**
+     * Function called on clicked images.
+     *
+     * @param label label of the instance data
+     * @param attributes object containing the list of selected instance attribute
+     */
+    function selectInstance(label, attributes) {
+        // Set default graph label corresponding to instance data
+        popoto.graph.mainLabel = label;
+
+        // update global variable with new instance data
+        instanceData = {
+            "label": label,
+            "attributes": attributes
+        };
+
+        // Reset the graph which will trigger popoto.graph.Events.NODE_ROOT_ADD event and update graph using instance data as root value
+        popoto.tools.reset();
+
+        // Clean instanceData for future graph reset and avoid using this instance data (for example when a new taxonomy is selected)
+        instanceData = null;
+    }
+
+    /**
+     * Add a listener on result received to update selection when it contains only one element.
+     */
+    popoto.result.onResultReceived(
+            function (resultObjects) {
+                // Only display selected data if results contains only one element
+                if (resultObjects.length == 1) {
+                    var html = "";
+
+                    for (var property in resultObjects[0].attributes) {
+                        if (resultObjects[0].attributes.hasOwnProperty(property)) {
+                            html = html + property + ":'" + resultObjects[0].attributes[property] + "'<br>";
+                        }
+                    }
+
+                    // Display and set div content with selection.
+                    d3.select("#selection").style("display", "block").html(html);
+                } else {
+                    d3.select("#selection").style("display", "none").html("");
+                }
+            }
+    );
+
+    // Define the list of label provider to customize the graph behavior:
+    // Only two labels are used in Neo4j movie graph example: "Movie" and "Person"
+    popoto.provider.nodeProviders = {
+        "Movie": {
+            "returnAttributes": ["title", "released", "tagline"],
+            "constraintAttribute": "title",
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.IMAGE;
+            },
+            "getImagePath": function (node) {
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    return "movies/" + node.attributes.title.replace("/", " ") + ".jpg";
+                } else {
+                    if (node.value !== undefined) {
+                        return "movies/" + node.value.attributes.title.replace("/", " ") + ".jpg";
+                    } else {
+                        if (node.type === popoto.graph.node.NodeTypes.ROOT) {
+                            return "movies/movie_blue.svg";
+                        } else {
+                            if (node.count == 0) {
+                                return "movies/movie_disabled.svg";
+                            } else {
+                                return "movies/movie_green.svg";
+                            }
+                        }
+                    }
+                }
+            },
+            // Disable text on nodes as images are used instead.
+            "getIsTextDisplayed": function (node) {
+                return false;
+            },
+            "resultOrderByAttribute": "title",
+            "valueOrderByAttribute": "title",
+            "isValueOrderAscending": true,
+            // Customize result display for Movie nodes:
+            "displayResults": function (pResultElmt) {
+
+                var div1 = pResultElmt.append("div").attr("style", "display: flex;");
+                div1.append("img")
+                        .attr("height", "100")
+                        .attr("width", "68")
+                        .attr("src", function (result) {
+                            return "movies/" + result.attributes.title.replace("/", " ") + ".jpg";
+                        });
+
+                var div = div1.append("div").attr("style", "margin-left: 20px;");
+                // An <h3> element containing the movie title
+                div.append("h3")
+                        .text(function (result) {
+                            return result.attributes.title;
+                        });
+
+                div.append("span")
+                        .text(function (result) {
+                            return "Tagline: " + result.attributes.tagline;
+                        });
+
+                div.append("span")
+                        .text(function (result) {
+                            return "Released: " + result.attributes.released;
+                        });
+
+            }
+        },
+        "Person": {
+            "returnAttributes": ["name", "born"],
+            "constraintAttribute": "name",
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.IMAGE;
+            },
+            "getImagePath": function (node) {
+                var path;
+
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    path = "persons/" + node.attributes.name + ".jpg";
+                } else {
+                    if (node.value !== undefined) {
+                        path = "persons/" + node.value.attributes.name + ".jpg";
+                    } else {
+                        if (node.type === popoto.graph.node.NodeTypes.ROOT) {
+                            path = "persons/person_blue.svg";
+                        } else {
+                            if (node.count == 0) {
+                                path = "persons/person_disabled.svg";
+                            } else {
+                                path = "persons/person_green.svg";
+                            }
+                        }
+                    }
+                }
+                return path;
+            },
+            // Disable text on nodes
+            "getIsTextDisplayed": function (node) {
+                return false;
+            },
+            "resultOrderByAttribute": "name",
+            "valueOrderByAttribute": "name",
+            "isValueOrderAscending": true,
+            // Customize result display for Person nodes:
+            "displayResults": function (pResultElmt) {
+
+                // Here D3.js mechanisms is used to generate HTML code.
+                // By default Popoto.js generates a <p> element for each result.
+                // pResultElmt parameter is the <p> element selected with D3.js
+
+                var div1 = pResultElmt.append("div").attr("style", "display: flex;");
+                div1.append("img")
+                        .attr("height", "100")
+                        .attr("width", "68")
+                        .attr("src", function (result) {
+                            return "persons/" + result.attributes.name + ".jpg";
+                        });
+
+                var div = div1.append("div").attr("style", "margin-left: 20px;");
+                // An <h3> element containing the person name
+                div.append("h3")
+                        .text(function (result) {
+                            return result.attributes.name;
+                        });
+
+                // A <span> element with the computed age from born attribute
+                div.filter(function (result) {
+                    // Filter on attribute having born attribute value
+                    return result.attributes.born;
+                }).append("span").text(function (result) {
+                    return "Age: " + (new Date().getFullYear() - result.attributes.born);
+                });
+            }
+        }
+    };
+
+    // Define the label provider used to customize the link displayed text:
+    popoto.provider.linkProvider = {
+
+        // Customize the text displayed on links:
+        "getLinkTextValue": function (link) {
+
+            // The links labels are just changed in lower case in this example.
+            // But it is possible to use a localization mechanism here to replace values.
+            if (link.type === popoto.graph.link.LinkTypes.RELATION) {
+                switch (link.label) {
+                    case "ACTED_IN":
+                        return "Acted in";
+                    case "DIRECTED":
+                        return "Directed";
+                    case "PRODUCED":
+                        return "Produced";
+                    case "WROTE":
+                        return "Wrote";
+                    case "FOLLOWS":
+                        return "Follows";
+                    case "REVIEWED":
+                        return "Reviewed";
+                    default :
+                        return "Unexpected relation"
+                }
+            } else {
+                return popoto.provider.getSemanticValue(link.target);
+            }
+        }
+    };
+
+    // Change the number of displayed results:
+    popoto.query.RESULTS_PAGE_SIZE = 100;
+
+    // Add a rootNodeListener on returned result count to update count in page
+    popoto.result.onTotalResultCount(function (count) {
+        d3.select("#rescount").text(function (d) {
+            return "(" + count + ")";
+        })
+    });
+
+    // Start the generation using parameter as root label of the query.
+    popoto.start("Person");
+
+</script>
+</body>
+</html>

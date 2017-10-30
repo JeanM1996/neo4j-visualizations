@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>graph-results</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <link rel="stylesheet" href="css/vis.min.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <script src="../../js/analytics.js"></script>
+</head>
+<body>
+<div id="popoto-taxonomy" class="drawer">
+    <h5>Node labels</h5>
+    <!-- Label/taxonomy filter will be generated here -->
+</div>
+<div id="main" class="main">
+    <div class="frame" id="popoto-graph">
+        <!-- Graph will be generated here-->
+    </div>
+    <div class="code-bar" id="popoto-cypher">
+    </div>
+    <div class="frame" id="vis">
+        <!-- Results visualization will be generated here -->
+    </div>
+</div>
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script src="js/vis.min.js"></script>
+<script src="../connection.js"></script>
+<script>
+    // Change ellipses dimension to have circles
+    popoto.graph.node.ELLIPSE_RX = 40;
+    popoto.graph.node.ELLIPSE_RY = 40;
+    popoto.graph.node.TEXT_Y = 6;
+    popoto.graph.LINK_DISTANCE = 100;
+    popoto.graph.node.BACK_CIRCLE_R = 48;
+
+    // Disable toggle taxonomy tool button
+    popoto.tools.TOGGLE_TAXONOMY = false;
+
+    popoto.graph.node.NODE_MAX_CHARS = 13;
+
+
+    // Define the label provider used to customize the link displayed text:
+    popoto.provider.linkProvider = {
+
+        // Customize the text displayed on links:
+        "getLinkTextValue": function (link) {
+
+            // The links labels are just changed in lower case in this example.
+            // But it is possible to use a localization mechanism here to replace values.
+            if (link.type === popoto.graph.link.LinkTypes.RELATION) {
+                switch (link.label) {
+                    case "ACTED_IN":
+                        return "Acted in";
+                    case "DIRECTED":
+                        return "Directed";
+                    case "PRODUCED":
+                        return "Produced";
+                    case "WROTE":
+                        return "Wrote";
+                    case "FOLLOWS":
+                        return "Follows";
+                    case "REVIEWED":
+                        return "Reviewed";
+                    default :
+                        return link.label;
+                }
+            }
+        }
+    };
+
+    // Change the number of displayed results:
+    popoto.query.RESULTS_PAGE_SIZE = 25;
+
+    popoto.logger.LEVEL = popoto.logger.LogLevels.INFO;
+
+    /**
+     * Add a listener on result received to update map.
+     */
+    popoto.result.onGraphResultReceived(
+        function (graphResultObject) {
+
+            var nodes = convertNodes(graphResultObject.nodes);
+            var edges = convertEdges(graphResultObject.edges);
+            var container = document.getElementById('vis');
+
+            // provide the data in the vis format
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+            var options = {
+                nodes: {
+                    shape: 'circle',
+                    borderWidth: 2,
+                    size: 20,
+                    font: {
+                        size: 10,
+                        color: '#ffffff'
+                    }
+                },
+                edges: {
+                    length: 200,
+                    font: {
+                        align: 'top',
+                        size: 10
+                    },
+                    arrows: 'to'
+                },
+                groups: {
+                    "Contact": {
+                        color: {background: '#68BDF6', border: '#5CA8DB'}
+                    },
+                    "Account": {
+                        color: {background: '#FF756E', border: '#E06760'}
+                    }
+                }
+            };
+
+            // initialize the network
+            var network = new vis.Network(container, data, options);
+        }
+    );
+
+    function convertNodes(nodes) {
+        var convertedNodes = [];
+
+        nodes.forEach(function (node) {
+            var nodeLabel = node.labels[0];
+            convertedNodes.push({
+                id: node.id,
+                label: (nodeLabel == "Contact" ? node.properties["name"] : node.properties["title"]),
+                group: nodeLabel
+            })
+        });
+
+        return convertedNodes;
+    }
+
+    function convertEdges(edges) {
+        var convertedEdges = [];
+
+        edges.forEach(function (edge) {
+            convertedEdges.push({
+                from: edge.startNode,
+                to: edge.endNode,
+                label: edge.type
+            })
+        });
+
+        return convertedEdges;
+    }
+
+    // Start the generation using parameter as root label of the query.
+    popoto.start("Account");
+
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+.ppt-body {
+    font: 13px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #D2D5DA;
+    margin: 0;
+    border-radius: 0;
+}
+
+.ppt-container-graph {
+    height: 650px;
+    border-radius: 0;
+}
+
+.ppt-header {
+    background-color: #292b31;
+    border-radius: 0;
+    background-image: url('../../../css/image/popoto-small.png');
+}
+
+.ppt-header-span {
+    color: #5dade2;
+}
+
+.ppt-taxo-tag {
+    display: none;
+}
+
+.ppt-div-graph {
+    background-color: #F9FBFD;
+    border-radius: 0;
+}
+
+.ppt-container-query, .ppt-container-cypher {
+    border-bottom: 1px solid #e6e9ef;
+    margin-top: 0;
+    border-top: 1px solid #e6e9ef;
+    background: #fff;
+    font-weight: 700;
+    padding: 0;
+    border-radius: 0;
+}
+
+.ppt-section-tips {
+    background-color: #0E78B4;
+    margin-top: 0;
+    border-radius: 0;
+}
+
+.ppt-section-header {
+    margin-top: 0;
+    border-radius: 0;
+    background-color: #525864;
+}
+
+.ppt-node-background-circle {
+    fill: #fdcc59;
+}
+
+.ppt-node-background-circle.disabled {
+    fill: #c4c4c4;
+}
+
+.ppt-node-ellipse.root {
+    fill: #68BDF6;
+    stroke: #5CA8DB;
+    stroke-width: 2px;
+}
+
+.ppt-node-ellipse.choose {
+    fill: #6DCE9E;
+    stroke: #60B58B;
+    stroke-width: 2px;
+}
+
+.ppt-node-ellipse.value {
+    fill: #FF756E;
+    stroke: #E06760;
+    stroke-width: 2px;
+}
+
+.ppt-node-ellipse.selected-value {
+    fill: #f0b017;
+    stroke: #d1a209;
+    stroke-width: 2px;
+}
+
+.ppt-node-ellipse.selected-root-value {
+    fill: #8f5bcc;
+    stroke: #6f57ad;
+    stroke-width: 2px;
+}
+
+.ppt-node-ellipse.group {
+    fill: #A5ABB6;
+    stroke: #9AA1AC;
+    stroke-width: 2px;
+}
+
+.ppt-node-text-root {
+    font-size: 10px;
+    fill: #ffffff;
+}
+
+.ppt-node-text-choose {
+    font-size: 10px;
+    fill: #ffffff;
+}
+
+.ppt-node-text-value {
+    font-size: 10px;
+    fill: #ffffff;
+}
+
+.ppt-node-text-group {
+    font-size: 10px;
+    fill: #ffffff;
+}
+
+.ppt-link-relation {
+    stroke: #A5ABB6;
+    stroke-width: 1px;
+    stroke-dasharray: 500;
+}
+
+.ppt-link-relation.disabled {
+    stroke: #D3D3D3;
+    stroke-width: 1px;
+    stroke-dasharray: 500;
+}
+
+.ppt-link-value {
+    stroke: #A5ABB6;
+    stroke-width: 1px;
+    stroke-dasharray: 500;
+}
+
+.ppt-link-hover {
+    stroke: #6ac6ff;
+}
+
+.ppt-link-text-relation {
+    fill: #000000;
+    font-size: 10px;
+}
+
+.ppt-link-text-relation.value {
+    fill: #000000;
+    font-size: 10px;
+}
+
+.ppt-link-text-relation.disabled {
+    fill: #d3d3d3;
+    font-size: 10px;
+}
+
+.ppt-link-text-value {
+    fill: #525863;
+}
+
+.ppt-larrow {
+    stroke: #9AA1AC;
+    stroke-width: 2px;
+    fill: #A5ABB6;
+}
+
+.ppt-rarrow {
+    stroke: #9AA1AC;
+    stroke-width: 2px;
+    fill: #A5ABB6;
+}
+
+.ppt-larrow.enabled {
+    fill: #68BDF6;
+    stroke: #5CA8DB;
+}
+
+.ppt-rarrow.enabled {
+    fill: #68BDF6;
+    stroke: #5CA8DB;
+}
+
+.ppt-count-box.value {
+    fill: #FB95AF;
+    stroke: #E0849B;
+    stroke-width: 2px;
+}
+
+.ppt-count-box.value.disabled {
+    fill: #D3D3D3;
+    stroke: #c7c7c7;
+    stroke-width: 2px;
+    opacity: 0.8;
+}
+
+.ppt-count-box.root {
+    fill: #68BDF6;
+    stroke: #5CA8DB;
+    stroke-width: 2px;
+}
+
+.ppt-count-text {
+    fill: white;
+    font: 13px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.svg-highlight {
+    fill: #4D62CD;
+}
+
+.region-highlight {
+    fill: #4D62CD;
+}
+
+.region-back {
+    fill: #5B6376;
+}
+
+li img {
+    display: none;
+}
+
+.ppt-count {
+    cursor: pointer;
+    color: #fff;
+}
+
+.ppt-label {
+    cursor: pointer;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ppt-label:hover {
+    color: #0E78B4;
+}
+
+.ppt-taxo-nav {
+    background-color: #30333a;
+}
+
+.ppt-taxo-nav ul {
+    list-style-type: circle;
+}
+
+select {
+    background: #0E78B4;
+}
+
+.ppt-section-tips a {
+    color: #b9d4ec;;
+}
+
+.ppt-span {
+    font-family: Monaco, "Courier New", Terminal, monospace;
+    font-size: 12px;
+    color: #525864;
+}
+
+.ppt-span-root {
+    font-family: Monaco, "Courier New", Terminal, monospace;
+    font-size: 12px;
+}
+
+.ppt-span-value {
+    font-family: Monaco, "Courier New", Terminal, monospace;
+    font-size: 12px;
+}
+
+.ppt-span-link {
+    font-family: Monaco, "Courier New", Terminal, monospace;
+    font-size: 12px;
+    color: #525864;
+}
+
+.ppt-span-choose {
+    font-family: Monaco, "Courier New", Terminal, monospace;
+    font-size: 12px;
+}
+
+.ppt-span-group {
+    font-family: Monaco, "Courier New", Terminal, monospace;
+    font-size: 12px;
+}
+
+.ppt-container-results {
+    background-color: #EBECEC;
+}
+
+.ppt-result {
+    color: #666;
+    background-color: #fff;
+}
+
+.ppt-result:hover {
+    color: #666;
+    background-color: #F9FBFD;
+}
+
+.result-table {
+    background-color: #eee;
+    border-radius: 5px;
+    margin: 20px 10px;
+    width: 400px;
+}

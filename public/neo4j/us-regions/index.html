@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <script src="../../js/analytics.js"></script>
+    <style>
+
+        /* Classes used by region SVG paths */
+
+        .region-back {
+            fill: #2e3138;
+        }
+
+        .region-highlight {
+            fill: #f0b017;
+        }
+
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="ppt-body">
+
+<header class="ppt-header"></header>
+
+<section class="ppt-section-main" style="height: 900px">
+    <div class="ppt-section-header">
+        <span class="ppt-header-span">US regions -</span> example
+    </div>
+
+    <!-- By default the graph is generated on the HTML element with ID "popoto-graph"
+     If needed this id can be changed with property "popoto.graph.containerId" -->
+
+    <div id="popoto-graph" class="ppt-div-graph">
+        <!-- Graph is generated here-->
+    </div>
+
+</section>
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+
+<!-- Add regions svg paths from a js file -->
+<script src="svg-us-region-data.js" charset="utf-8"></script>
+<script>
+
+    popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+
+    popoto.query.filterRelation = function (d) {
+        return d.relationship != "LOCALITY";
+    };
+
+    // Define the list of label provider to customize the graph behavior:
+    popoto.provider.nodeProviders = {
+        "Region": {
+            "returnAttributes": ["name"],
+            "constraintAttribute": "name",
+            "getDisplayType": function (node) {
+                return popoto.provider.NodeDisplayTypes.SVG;
+            },
+            "getSVGPaths": function (node) {
+                // Create the list of SVG path to draw the node.
+                // A path here is composed of two elements: the SVG path ("d" attribute) and a CSS class
+                var paths = [];
+
+                // In this example the paths are stored in "USRegionsSVGPaths" variable defined in svg-location-data.js referenced script.
+                // But here you could consider using json, generated path, a dedicated service or even paths stored in node attribute data.
+
+                // Add US background path:
+                paths = paths.concat(USRegionsSVGPaths["US"]);
+
+                // Then depending on node type add the path of the region.
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    // The node is an expanded value then the path corresponding to the region name is added:
+                    paths = paths.concat(USRegionsSVGPaths["US-" + node.attributes.name]);
+                } else {
+                    if (node.value) {
+                        // The node is an expandable node with a selected value then the path corresponding to the selected value region name is added:
+                        paths = paths.concat(USRegionsSVGPaths["US-" + node.value.attributes.name]);
+                    }
+                }
+                return paths;
+            },
+            // Change displayed text to display full region name instead of code.
+            "getTextValue": function (node) {
+                if (node.type === popoto.graph.node.NodeTypes.VALUE) {
+                    return RegionCodeMapping[node.attributes.name];
+                } else {
+                    if (node.value === undefined) {
+                        return node.label;
+                    } else {
+                        return RegionCodeMapping[node.value.attributes.name];
+                    }
+                }
+            },
+            // Disable the displayed text on nodes to only see drawn paths
+            "getIsTextDisplayed": function (node) {
+                return false;
+            }
+        }
+    };
+
+    // Start the generation using parameter as root label of the query.
+    popoto.start("Region");
+
+</script>
+</body>
+</html>

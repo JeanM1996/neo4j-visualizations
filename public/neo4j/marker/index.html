@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <script src="../../js/analytics.js"></script>
+    <style>
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="ppt-body">
+
+
+
+<section class="ppt-section-main">
+    <div class="ppt-section-header">
+        <span class="ppt-header-span">Harding Point</span> Engagement Graph
+    </div>
+
+    <div class="ppt-container-graph">
+        <nav id="popoto-taxonomy" class="ppt-taxo-nav">
+            <!-- Label/taxonomy filter will be generated here -->
+        </nav>
+        <div id="popoto-graph" class="ppt-div-graph">
+            <!-- Graph will be generated here-->
+        </div>
+    </div>
+
+    <div id="popoto-query" class="ppt-container-query">
+        <!-- Query viewer will be generated here -->
+    </div>
+
+    <div id="popoto-cypher" class="ppt-container-cypher">
+        <!-- Cypher query viewer will be generated here -->
+    </div>
+
+    <div class="ppt-section-header">
+        <!-- The total results count is updated with a listener defined below -->
+        RESULTS <span id="result-total-count" class="ppt-count"></span>
+    </div>
+
+    <div id="popoto-results" class="ppt-container-results">
+        <!-- Results will be generated here -->
+    </div>
+
+</section>
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script src="../connection.js"></script>
+<script>
+
+    // Change ellipses to circle
+    popoto.graph.node.ELLIPSE_RX = 50;
+    popoto.graph.node.ELLIPSE_RY = 50;
+
+    // Modify link radius to see arroheads
+    popoto.graph.link.RADIUS = 55;
+
+
+    // Change the number of displayed results:
+    popoto.query.RESULTS_PAGE_SIZE = 10;
+
+    // Add a listener on returned result count to update count in page
+    popoto.result.onTotalResultCount(function (count) {
+        d3.select("#rescount").text(function (d) {
+            return "(" + count + ")";
+        });
+    });
+
+    popoto.start("Person");
+
+    /**
+     * Add SVG marker defs in popoto generated SVG:
+     */
+    defs = d3.select("svg").insert("defs", ":first-child");
+
+    // Add triangle marker for paths with id #arrow --|>
+    defs.append("marker")
+        .attr({
+            "id": "arrow",
+            "refX": 7,
+            "refY": 3,
+            "markerWidth": 10,
+            "markerHeight": 10,
+            "markerUnits": "strokeWidth",
+            "orient": "auto"
+        })
+        .append("path")
+        .attr("d", "M0,0 L0,6 L9,3 z")
+        .attr("fill", "#f00");// Fill the triangle with red color
+
+    // Add reversed triangle marker for paths with id #reverse-arrow <|--
+    defs.append("marker")
+        .attr({
+            "id": "reverse-arrow",
+            "refX": 2,
+            "refY": 3,
+            "markerWidth": 10,
+            "markerHeight": 10,
+            "markerUnits": "strokeWidth",
+            "orient": "auto"
+        })
+        .append("path")
+        .attr("d", "M0,3 L9,6 L9,0 z")
+        .attr("fill", "#f00");
+
+    // Customize the tick function used in Popoto to update graph on D3 force layout update:
+    popoto.graph.force.on("tick", function () {
+        var paths = popoto.graph.svg.selectAll("#" + popoto.graph.link.gID + " > g").selectAll("path");
+
+        paths.filter(function (d) {
+            return d.source.x <= d.target.x;
+        })
+            .attr("d", function (d) {
+                var parentAngle = popoto.graph.computeParentAngle(d.target);
+                var targetX = d.target.x + (popoto.graph.link.RADIUS * Math.cos(parentAngle)),
+                    targetY = d.target.y - (popoto.graph.link.RADIUS * Math.sin(parentAngle));
+
+                var sourceX = d.source.x - (popoto.graph.link.RADIUS * Math.cos(parentAngle)),
+                    sourceY = d.source.y + (popoto.graph.link.RADIUS * Math.sin(parentAngle));
+
+                return "M" + sourceX + " " + sourceY + "L" + targetX + " " + targetY;
+            })
+            .attr("marker-end", function (d) {
+                if (d.source.x <= d.target.x) {
+                    return "url(#arrow)";
+                } else {
+                    return "url(#reverse-arrow)";
+                }
+            })
+            .attr("marker-start", null);
+
+        paths.filter(function (d) {
+            return d.source.x > d.target.x;
+        })
+            .attr("d", function (d) {
+                var parentAngle = popoto.graph.computeParentAngle(d.target);
+                var targetX = d.target.x + (popoto.graph.link.RADIUS * Math.cos(parentAngle)),
+                    targetY = d.target.y - (popoto.graph.link.RADIUS * Math.sin(parentAngle));
+
+                var sourceX = d.source.x - (popoto.graph.link.RADIUS * Math.cos(parentAngle)),
+                    sourceY = d.source.y + (popoto.graph.link.RADIUS * Math.sin(parentAngle));
+
+                return "M" + targetX + " " + targetY + "L" + sourceX + " " + sourceY;
+            })
+            .attr("marker-start", function (d) {
+                return "url(#reverse-arrow)";
+            })
+            .attr("marker-end", null);
+
+        // Node transform update
+        popoto.graph.svg.selectAll("#" + popoto.graph.node.gID + " > g")
+            .attr("transform", function (d) {
+                return "translate(" + (d.x) + "," + (d.y) + ")";
+            });
+    });
+
+</script>
+</body>
+</html>

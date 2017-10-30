@@ -1,0 +1,742 @@
+{
+    "language": "Français",
+    "credit":"Cet exemple utilise un jeu de données de test fourni par <a href=\"http://www.factual.com/\">Factual</a> modèlisé sous forme de graph et injecté dans une base de donnée <a href=\"http://neo4j.com/\">Neo4j</a> qui est hébergée par <a href=\"http://www.graphenedb.com/\">GrapheneDB</a>. La carte est générée avec la librairie fournie par <a href=\"https://www.mapbox.com/\">Mapbox</a> et l'interface est générée par <a href=\"http://www.popotojs.com\">Popoto.js</a>.",
+    "tips":"<a href=\"https://vimeo.com/115401847\">Aide</a> - Cliquez sur un noeud du graph pour afficher et selectionner une valeur. Cliquez sur le \"plus\" sur un noeud pour afficher les relations. Le click droit permet de supprimer une selection. Merci d'utiliser ce <a href=\"http://groups.google.com/d/forum/popotojs-alpha\">Google Group</a> pour signaler un problème ou pour donner votre feedback.",
+    "langlabel":"Langue:",
+
+    "results":"RESULTATS",
+    "reschooser": "Résultat affichés:",
+
+    "query_find": "Je recherche",
+    "query_choose": "choisir",
+    "tool_taxonomy": "Afficher/cacher les taxonomies",
+    "tool_center": "Centrer la vue",
+    "tool_full_screen": "Plein écran",
+
+    "Country": {
+        "us": "Etats Unis",
+        "P_us": "aux Etats Unis"
+    },
+
+    "Region": {
+        "AK": "Alaska",
+        "AL": "Alabama",
+        "AR": "Arkansas",
+        "AZ": "Arizona",
+        "CA": "Californie",
+        "CO": "Colorado",
+        "CT": "Connecticut",
+        "DC": "Washington DC",
+        "DE": "Delaware",
+        "FL": "Floride",
+        "GA": "Géorgie",
+        "GU": "Guam",
+        "HI": "Hawaï",
+        "IA": "Iowa",
+        "ID": "Idaho",
+        "IL": "Illinois",
+        "IN": "Indiana",
+        "KS": "Kansas",
+        "KY": "Kentucky",
+        "LA": "Louisiane",
+        "MA": "Massachusetts",
+        "MD": "Maryland",
+        "ME": "Maine",
+        "MI": "Michigan",
+        "MN": "Minnesota",
+        "MO": "Missouri",
+        "MS": "Mississippi",
+        "MT": "Montana",
+        "NC": "Caroline du Nord",
+        "ND": "Dakota du Nord",
+        "NE": "Nebraska",
+        "NH": "New Hampshire",
+        "NJ": "New Jersey",
+        "NM": "Nouveau-Mexique",
+        "NV": "Nevada",
+        "NY": "New York",
+        "OH": "Ohio",
+        "OK": "Oklahoma",
+        "OR": "Oregon",
+        "PA": "Pennsylvanie",
+        "PR": "Puerto Rico",
+        "RI": "Rhode Island",
+        "SC": "Caroline du Sud",
+        "SD": "Dakota du Sud",
+        "TN": "Tennessee",
+        "TX": "Texas",
+        "UT": "Utah",
+        "VA": "Virginie",
+        "VI": "Virgin Islands",
+        "VT": "Vermont",
+        "WA": "Washington",
+        "WI": "Wisconsin",
+        "WV": "Virginie-Occidentale",
+        "WY": "Wyoming"
+    },
+
+    "Price": {
+        "1": "12€ -",
+        "P_1": "moins de 12€",
+        "2": "12€-24€",
+        "P_2": "entre 12€ et 24€",
+        "3": "24€-40€",
+        "P_3": "entre 24€ et 40€",
+        "4": "40€-60€",
+        "P_4": "entre 40€ and 60€",
+        "5": "60€ +",
+        "P_5": "plus de 60€"
+    },
+
+    "tools": {
+        "expand": "Agrandir",
+        "minimize": "Réduire"
+    },
+
+    "Boolean": {
+        "true": "oui",
+        "P_true": "oui",
+        "false": "non",
+        "P_false": "non"
+    },
+
+    "Labels": {
+        "Social": "Social",
+        "P_Social": "une structure sociale",
+
+        "Food and Dining": "Restauration",
+        "P_Food and Dining": "une lieu de restauration",
+
+        "Restaurants": "Restaurant",
+        "P_Restaurants": "un restaurant",
+
+        "Asian": "Asiatique",
+        "P_Asian": "un restaurant Asiatique",
+
+        "Fast Food": "Fast Food",
+        "P_Fast Food": "un fast-food",
+
+        "Steakhouses": "Steakhouse",
+        "P_Steakhouses": "un steakhouses",
+
+        "Korean": "Coréen",
+        "P_Korean": "un restaurants Coréen",
+
+        "Vegan and Vegetarian": "Vegan et Végétarien",
+        "P_Vegan and Vegetarian": "un restaurant vegan et végétarien",
+
+        "Seafood": "Fruit de mer",
+        "P_Seafood": "un restaurant de fruits de mer",
+
+        "Diners": "Diner",
+        "P_Diners": "un restaurant diner",
+
+        "Chinese": "Chinois",
+        "P_Chinese": "un restaurant Chinois",
+
+        "Delis": "Traiteur",
+        "P_Delis": "un traiteur",
+
+        "French": "Français",
+        "P_French": "un restaurant Français",
+
+        "Japanese": "Japonais",
+        "P_Japanese": "un restaurant Japonais",
+
+        "Middle Eastern": "Moyen orient",
+        "P_Middle Eastern": "un restaurant moyen orient",
+
+        "American": "Americain",
+        "P_American": "un restaurant Américain",
+
+        "Indian": "Indien",
+        "P_Indian": "un restaurant Indien",
+
+        "Barbecue": "Barbecue",
+        "P_Barbecue": "un restaurant de barbecue",
+
+        "Mexican": "Mexicain",
+        "P_Mexican": "un restaurant Mexicain",
+
+        "Food Trucks": "Food Truck",
+        "P_Food Trucks": "un food truck",
+
+        "Pizza": "Pizzeria",
+        "P_Pizza": "une pizzeria",
+
+        "Sushi": "Sushi",
+        "P_Sushi": "un restaurant de sushi",
+
+        "Italian": "Italien",
+        "P_Italian": "un restaurant Italien",
+
+        "Thai": "Thailandais",
+        "P_Thai": "un restaurant Thailandais",
+
+        "Burgers": "Burger",
+        "P_Burgers": "un restaurant de burgers",
+
+        "Cafes": "Café",
+        "P_Cafes": "un café",
+
+        "Coffee and Tea Houses": "Salon de thé",
+        "P_Coffee and Tea Houses": "un salon de thé",
+
+        "Dessert": "Dessert",
+        "P_Dessert": "un vendeur de desserts",
+
+        "Bagels and Donuts": "Bagels et Donuts",
+        "P_Bagels and Donuts": "un vendeur de bagels et donuts",
+
+        "Bakeries": "Boulangerie",
+        "P_Bakeries": "une boulangeries",
+
+        "Ice Cream Parlors": "Crème Glacée",
+        "P_Ice Cream Parlors": "un vendeur de crèmes glacées",
+
+        "Juice Bars and Smoothies": "Bar à Jus de Fruits",
+        "P_Juice Bars and Smoothies": "un bar à jus de fruits et smoothies",
+
+        "Bars": "Bar",
+        "P_Bars": "un bar",
+
+        "Hotel Lounges": "Bar-Salon d'Hôtel",
+        "P_Hotel Lounges": "un bar-salon d'hôtel",
+
+        "Wine Bars": "Bar à vins",
+        "P_Wine Bars": "un bar à vins",
+
+        "Sports Bars": "Café des sports",
+        "P_Sports Bars": "un café des sports",
+
+        "Landmarks": "Lieu touristique",
+        "P_Landmarks": "un lieu touristique",
+
+
+
+        "Cuisine": "Cuisine",
+        "P_Cuisine": "une cuisine",
+
+        "Founded": "Année",
+        "P_Founded": "une année",
+
+        "Neighborhood": "Voisinage",
+        "P_Neighborhood": "un voisinage",
+
+        "Country": "Pays",
+        "P_Country": "un pays",
+
+        "Region": "Région",
+        "P_Region": "une région",
+
+        "Locality": "Ville",
+        "P_Locality": "une ville",
+
+        "Price": "Coût",
+        "P_Price": "un coût",
+
+        "Boolean": "Oui/Non",
+        "P_Boolean": "une valeur",
+
+        "CanDeliver": "Oui/Non",
+        "P_CanDeliver": "une valeur",
+
+        "IsCashOnly": "Oui/Non",
+        "P_IsCashOnly": "une valeur",
+
+        "IsOpen24": "Oui/Non",
+        "P_IsOpen24": "une valeur",
+
+        "ServeLunch": "Oui/Non",
+        "P_ServeLunch": "une valeur",
+
+        "CanTakeout": "Oui/Non",
+        "P_CanTakeout": "une valeur",
+
+        "IsKidGoodFor": "Oui/Non",
+        "P_IsKidGoodFor": "une valeur",
+
+        "ServeDinner": "Oui/Non",
+        "P_ServeDinner": "une valeur",
+
+        "HasWifi": "Oui/Non",
+        "P_HasWifi": "une valeur",
+
+        "ServeAlcohol": "Oui/Non",
+        "P_ServeAlcohol": "une valeur",
+
+        "IsReservation": "Oui/Non",
+        "P_IsReservation": "une valeur",
+
+        "IsBeerWineOnly": "Oui/Non",
+        "P_IsBeerWineOnly": "une valeur",
+
+        "HasBar": "Oui/Non",
+        "P_HasBar": "une valeur",
+
+        "HasParking": "Oui/Non",
+        "P_HasParking": "une valeur",
+
+        "ServeBreakfast": "Oui/Non",
+        "P_ServeBreakfast": "une valeur",
+
+        "CanCater": "Oui/Non",
+        "P_CanCater": "une valeur",
+
+        "IsHealthy": "Oui/Non",
+        "P_IsHealthy": "une valeur",
+
+        "HasLot": "Oui/Non",
+        "P_HasLot": "une valeur",
+
+        "HasSeatingOutdoor": "Oui/Non",
+        "P_HasSeatingOutdoor": "une valeur",
+
+        "IsVegetarian": "Oui/Non",
+        "P_IsVegetarian": "une valeur",
+
+        "IsGroupGoodFor": "Oui/Non",
+        "P_IsGroupGoodFor": "une valeur",
+
+        "IsBYOB": "Oui/Non",
+        "P_IsBYOB": "une valeur",
+
+        "IsAccessibleWheelchair": "Oui/Non",
+        "P_IsAccessibleWheelchair": "une valeur",
+
+        "HasKidMenu": "Oui/Non",
+        "P_HasKidMenu": "une valeur",
+
+        "IsStreet": "Oui/Non",
+        "P_IsStreet": "une valeur",
+
+        "Chain": "Chaîne",
+        "P_Chain": "une chaine ou franchise",
+
+        "IsFree": "Oui/Non",
+        "P_IsFree": "une valeur",
+
+        "IsSmoking": "Oui/Non",
+        "P_IsSmoking": "une valeur",
+
+        "IsGlutenFree": "Oui/Non",
+        "P_IsGlutenFree": "une valeur",
+
+        "IsVegan": "Oui/Non",
+        "P_IsVegan": "une valeur",
+
+        "HasValet": "Oui/Non",
+        "P_HasValet": "une valeur",
+
+        "HasGarage": "Oui/Non",
+        "P_HasGarage": "une valeur",
+
+        "IsValidated": "Oui/Non",
+        "P_IsValidated": "une valeur",
+
+        "IsOrganic": "Oui/Non",
+        "P_IsOrganic": "une valeur",
+
+        "IsLowFat": "Oui/Non",
+        "P_IsLowFat": "une valeur",
+
+
+
+        "Option": "Options",
+        "P_Option": "avec options",
+
+        "MealOption": "Service supplémentaire",
+        "P_MealOption": "avec service supplémentaire",
+
+        "AccessibilityOption": "Accueil",
+        "P_AccessibilityOption": "avec option d'accueil",
+
+        "AttireOption": "Option vestimentaire",
+        "P_AttireOption": "avec option vestimentaire",
+
+        "DietOption": "Choix alimentaire",
+        "P_DietOption": "avec option alimentaire",
+
+
+        "Attire": "Code vestimentaire",
+        "P_Attire": "qui impose un code vestimentaire",
+
+        "AttireProhibited": "Vetement interdit",
+        "P_AttireProhibited": "interdit le port"
+    },
+
+
+    "Links": {
+        "CUISINE": "Propose",
+        "P_CUISINE": "qui propose",
+
+        "OPTIONS": "Possédant",
+        "P_OPTIONS": "possédant",
+
+        "COUNTRY": "Situé",
+        "P_COUNTRY": "situé",
+
+        "PRICE": "Entre",
+        "P_PRICE": "pour un coût",
+
+        "CHAIN": "Membre de",
+        "P_CHAIN": "membre de",
+
+        "FOUNDED": "Fondé en",
+        "P_FOUNDED": "fondé en",
+
+        "REGION": "Dans l'état",
+        "P_REGION": "dans l'état",
+
+        "LOCALITY": "Dans",
+        "P_LOCALITY": "dans",
+
+        "NEIGHBORHOOD": "Près",
+        "P_NEIGHBORHOOD": "près",
+
+        "ACCESSIBILITY": "Type",
+        "P_ACCESSIBILITY": "de type",
+
+        "MEALS": "Type",
+        "P_MEALS": "de type",
+
+        "CASH_ONLY": "Accepte espèces uniquement",
+        "P_CASH_ONLY": "accepte de l'espèces uniquement",
+
+        "WIFI": "Propose",
+        "P_WIFI": "propose le wifi",
+
+        "RESERVATION": "Accèpte les réservations",
+        "P_RESERVATION": "accepte les réservations",
+
+        "PARKING": "Possède parking",
+        "P_PARKING": "possède un parking",
+
+        "DIET": "Type",
+        "P_DIET": "de type",
+
+        "SMOKING": "Dispose d'espace fumeur",
+        "P_SMOKING": "dispose d'espace fumeur",
+
+        "ATTIRE_OPTION": "Option vestimentaire",
+        "P_ATTIRE_OPTION": "avec option vestimentaire",
+
+        "KID_GOODFOR": "Accessible au enfant",
+        "P_KID_GOODFOR": "accessible au enfant",
+
+        "OPEN_24": "Ouvert 24h/24h",
+        "P_OPEN_24": "ouvert 24h/24h",
+
+        "OUTDOOR": "Table en terrace",
+        "P_OUTDOOR": "table en terrace",
+
+        "GROUP_GOODFOR": "Accessible aux groupes",
+        "P_GROUP_GOODFOR": "accessible aux groupes",
+
+        "WHEELCHAIR": "Accessible en fauteuil roulant",
+        "P_WHEELCHAIR": "accessible en fauteuil roulant",
+
+        "KID_MENU": "Menu pour enfant",
+        "P_KID_MENU": "menu pour enfant",
+
+        "HEALTHY": "Repas santé",
+        "P_HEALTHY": "repas santé",
+
+        "VEGETARIAN": "Repas végétarien",
+        "P_VEGETARIAN": "repas végétarien",
+
+        "GLUTEN_FREE": "Repas sans gluten",
+        "P_GLUTEN_FREE": "repas sans gluten",
+
+        "VEGAN": "Repas végétalien",
+        "P_VEGAN": "repas végétalien",
+
+        "ORGANIC": "Repas bio",
+        "P_ORGANIC": "repas bio",
+
+        "LOW_FAT": "Repas pauvre en graisse",
+        "P_LOW_FAT": "repas pauvre en graisse",
+
+        "PARKING_LOT": "Parking privatif",
+        "P_PARKING_LOT": "parking privatif",
+
+        "PARKING_STREET": "Parking dans la rue",
+        "P_PARKING_STREET": "parking dans la rue",
+
+        "PARKING_FREE": "Parking gratuit",
+        "P_PARKING_FREE": "parking gratuit",
+
+        "PARKING_VALET": "Valet de parking",
+        "P_PARKING_VALET": "valet de parking",
+
+        "PARKING_GARAGE": "Parking couvert",
+        "P_PARKING_GARAGE": "parking couvert",
+
+        "PARKING_VALIDATED": "Validation parking",
+        "P_PARKING_VALIDATED": "validation parking",
+
+        "MEAL_DELIVER": "Livre à domicile",
+        "P_MEAL_DELIVER": "livre à domicile",
+
+        "MEAL_LUNCH": "Sert au déjeuner",
+        "P_MEAL_LUNCH": "sert au déjeuner",
+
+        "MEAL_TAKEOUT": "Plat à emporter",
+        "P_MEAL_TAKEOUT": "plat à emporter",
+
+        "MEAL_DINNER": "Sert au dîner",
+        "P_MEAL_DINNER": "sert au dîner",
+
+        "ALCOHOL": "Sert de l'alcool",
+        "P_ALCOHOL": "sert de l'alcool",
+
+        "MEAL_BREAKFAST": "Sert au petit déjeuner",
+        "P_MEAL_BREAKFAST": "sert au petit déjeuner",
+
+        "MEAL_CATER": "Menus traiteur",
+        "P_MEAL_CATER": "menus traiteur",
+
+        "ATTIRE": "Code vestimentaire",
+        "P_ATTIRE": "code vestimentaire",
+
+        "PROHIBITED": "Port interdit",
+        "P_PROHIBITED": "port interdit",
+
+        "BEER_WINE": "Sert uniquement vin et bière",
+        "P_BEER_WINE": "sert uniquement vin et bière",
+
+        "BAR": "Bar séparé",
+        "P_BAR": "bar séparé",
+
+        "BYOB": "Apporter son propre alcool",
+        "P_BYOB": "apporter son propre alcool"
+    },
+
+    "Cuisine":{
+      "Pizza": "Pizza",
+      "P_Pizza": "des pizzas",
+      "Chinese": "Chinois",
+      "P_Chinese": "de la cuisine chinoise",
+      "Chicken": "Poulet",
+      "P_Chicken": "du poulet",
+      "American": "Américain",
+      "P_American": "de la cuisine Américaine",
+      "Fast Food": "Fast Food",
+      "P_Fast Food": "fast-food",
+      "Burgers": "Hamburger",
+      "P_Burgers": "des hamburgers",
+      "Traditional": "Traditionnel",
+      "P_Traditional": "de la cuisine traditionnel",
+      "Diner": "Dinner",
+      "P_Diner": "Dinner",
+      "Subs": "Subs",
+      "P_Subs": "des sandwiches subs",
+      "Sandwiches": "Sandwich",
+      "P_Sandwiches": "des sandwiches",
+      "Bakery": "Boulangerie",
+      "P_Bakery": "plat de boulangerie",
+      "Vegetarian": "Végétarien",
+      "P_Vegetarian": "de la cuisine végétarienne",
+      "Vegan": "végétalien",
+      "P_Vegan": "de la cuisine végétalienne",
+      "Grill": "Grill",
+      "P_Grill": "un grill",
+      "Mexican": "Mexicain",
+      "P_Mexican": "de la cuisine mexicaine",
+      "Coffee": "Café",
+      "P_Coffee": "du café",
+      "Cafe": "Café",
+      "P_Cafe": "des plat de café",
+      "Deli": "Traiteur",
+      "P_Deli": "des plat de traiteur",
+      "Ice Cream": "Glace",
+      "P_Ice Cream": "des glaces",
+      "Tex Mex": "Tex Mex",
+      "P_Tex Mex": "de la cuisine Tex Mex",
+      "Salad": "Salade",
+      "P_Salad": "des salades",
+      "European": "Européen",
+      "P_European": "de la cuisine européenne",
+      "Italian": "Italien",
+      "P_Italian": "de la cuisine italienne",
+      "Fusion": "Fusion",
+      "P_Fusion": "de la cuisine Fusion",
+      "Eclectic": "Eclectique",
+      "P_Eclectic": "de la cuisine éclectique",
+      "Contemporary": "Contemporain",
+      "P_Contemporary": "de la cuisine contemporaine",
+      "Indian": "Indienne",
+      "P_Indian": "de la cuisine indienne",
+      "Soup": "Soupe",
+      "P_Soup": "de la soupe",
+      "Frozen Yogurt": "Yogourt glacé",
+      "P_Frozen Yogurt": "des yogourt glacé",
+      "Pan Asian": "Pan Asian",
+      "P_Pan Asian": "de la cuisine Pan Asian",
+      "Asian": "Asiatique",
+      "P_Asian": "de la cuisine asiatique",
+      "Pub Food": "Pub",
+      "P_Pub Food": "de la cuisine de pub",
+      "International": "International",
+      "P_International": "de la cuisine international",
+      "Sushi": "Sushi",
+      "P_Sushi": "des sushis",
+      "Spanish": "Espagnol",
+      "P_Spanish": "de la cuisine Espagnol",
+      "Venezuelan": "Vénézuélien",
+      "P_Venezuelan": "de la cuisine vénézuélienne",
+      "South American": "Sud-Américain",
+      "P_South American": "de la cuisine sud-américaine",
+      "Latin": "Latine",
+      "P_Latin": "de la cuisine latine",
+      "Latin American": "Latino-Américain",
+      "P_Latin American": "de la cuisine latino-américaine",
+      "Puerto Rican": "Portoricain",
+      "P_Puerto Rican": "de la cuisine portoricaine",
+      "Caribbean": "Caraibes",
+      "P_Caribbean": "de la cuisine des caraibes",
+      "Creole": "Créole",
+      "P_Creole": "de la cuisine Créole",
+      "Southern": "Sud",
+      "P_Southern": "de la cuisine du sud",
+      "Cajun": "Acadienne",
+      "P_Cajun": "de la cuisine Acadienne",
+      "Kosher": "Casher",
+      "P_Kosher": "de la cuisine casher",
+      "Tea": "Thé",
+      "P_Tea": "du thé",
+      "Egyptian": "Egyptienne",
+      "P_Egyptian": "de la cuisine égyptienne",
+      "Noodle Bar": "Nouilles",
+      "P_Noodle Bar": "un bar à nouilles",
+      "Japanese": "Japonais",
+      "P_Japanese": "de la cuisine japonaise",
+      "Bistro": "Bistro",
+      "P_Bistro": "de la cuisine de bistro",
+      "Seafood": "Fruits de mer",
+      "P_Seafood": "des fruits de mer",
+      "Mediterranean": "Méditerranéen",
+      "P_Mediterranean": "de la cuisine méditerranéenne",
+      "Wings": "Ailes de poulet",
+      "P_Wings": "des ailes de poulet",
+      "Healthy": "Diététique",
+      "P_Healthy": "de la cuisine diététique",
+      "Korean": "Coréen",
+      "P_Korean": "de la cuisine Coréenne",
+      "French": "Français",
+      "P_French": "de la cuisine française",
+      "Bagels": "Bagels",
+      "P_Bagels": "des bagels",
+      "Thai": "Thaïlandais",
+      "P_Thai": "de la cuisine Thaïlandaise",
+      "Wraps": "Wraps",
+      "P_Wraps": "des wraps",
+      "Donuts": "Donuts",
+      "P_Donuts": "des donuts",
+      "Soul Food": "Soul",
+      "P_Soul Food": "de la Soul Food",
+      "Barbecue": "Barbecue",
+      "P_Barbecue": "du barbecue",
+      "Mongolian": "Mongole",
+      "P_Mongolian": "de la cuisine mongole",
+      "Irish": "Irlandais",
+      "P_Irish": "de la cuisine Irlandaise ",
+      "Hot Dogs": "Hot Dogs",
+      "P_Hot Dogs": "des hot dogs",
+      "Vietnamese": "Vietnamien",
+      "P_Vietnamese": "de la cuisine vietnamienne",
+      "Steak": "Steak",
+      "P_Steak": "des steaks",
+      "Halal": "ḥalāl ",
+      "P_Halal": "de la cuisine ḥalāl",
+      "Pasta": "Pâtes",
+      "P_Pasta": "des pâtes",
+      "Organic": "Bio",
+      "P_Organic": "de la cuisine bio",
+      "Dim Sum": "Dim Sum",
+      "P_Dim Sum": "du Dim Sum",
+      "Ribs": "Côtes",
+      "P_Ribs": "des côtes",
+      "Hawaiian": "Hawaiien",
+      "P_Hawaiian": "de la cuisine Hawaiienne",
+      "Cuban": "cubain",
+      "P_Cuban": "de la cuisine cubaine",
+      "Smoothies": "Smoothies",
+      "P_Smoothies": "des smoothies",
+      "Brazilian": "Brésilien",
+      "P_Brazilian": "de la cuisine Brésilienne",
+      "Moroccan": "Marocain",
+      "P_Moroccan": "de la cuisine Marocaine",
+      "Californian": "Californien",
+      "P_Californian": "de la cuisine Californienne",
+      "Southwestern": "Sud-Ouest",
+      "P_Southwestern": "de la cuisine du sud-ouest",
+      "Tapas": "Tapas",
+      "P_Tapas": "des tapas",
+      "Middle Eastern": "Moyen-Orient",
+      "P_Middle Eastern": "de la cuisine du Moyen-Orient",
+      "Turkish": "Turque",
+      "P_Turkish": "de la cuisine Turque",
+      "Persian": "Iranien",
+      "P_Persian": "de la cuisine Iranienne",
+      "Greek": "Grecque",
+      "P_Greek": "de la cuisine Grecque",
+      "Israeli": "Israelien",
+      "P_Israeli": "de la cuisine Israelienne",
+      "Austrian": "Autrichien",
+      "P_Austrian": "de la cuisine Autrichienne",
+      "German": "Allemand",
+      "P_German": "de la cuisine Allemande",
+      "Juices": "Jus",
+      "P_Juices": "des jus",
+      "Pho": "Pho",
+      "P_Pho": "des Pho",
+      "Pastries": "Patisserie",
+      "P_Pastries": "des patisserie",
+      "Calzones": "Calzones",
+      "P_Calzones": "des calzones",
+      "British": "Britannique",
+      "P_British": "de la cuisine Britannique",
+      "Continental": "Continental",
+      "P_Continental": "de la cuisine continental",
+      "Pakistani": "Pakistanais",
+      "P_Pakistani": "de la cuisine Pakistanaise",
+      "Pacific Rim": "Pacifique",
+      "P_Pacific Rim": "de la cuisine du Pacifique",
+      "Crepes": "Crêpes",
+      "P_Crepes": "des crêpes",
+      "Gastropub": "Gastropub",
+      "P_Gastropub": "un Gastropub",
+      "Cambodian": "Cambodgien",
+      "P_Cambodian": "de la cuisine Cambodgienne",
+      "African": "Africain",
+      "P_African": "de la cuisine Africaine",
+      "Burmese": "Birmane",
+      "P_Burmese": "de la cuisine Birmane",
+      "Australian": "Australien",
+      "P_Australian": "de la cuisine Australienne",
+      "Oysters": "Huître",
+      "P_Oysters": "des huître",
+      "Filipino": "Philippin",
+      "P_Filipino": "de la cuisine Philippines",
+      "Colombian": "Colombien",
+      "P_Colombian": "de la cuisine Colombienne",
+      "English": "Anglais",
+      "P_English": "de la cuisine Anglaise",
+      "Cheesesteaks": "Steak fromage",
+      "P_Cheesesteaks": "des steaks de fromage",
+      "Haitian": "Haïtien",
+      "P_Haitian": "de la cuisine Haïtien",
+      "Armenian": "Armenien",
+      "P_Armenian": "de la cuisine Armenienne",
+      "Jamaican": "Jamaïcain",
+      "P_Jamaican": "de la cuisine Jamaïcaine",
+      "Czech": "Tchèque",
+      "P_Czech": "de la cuisine Tchèque"
+    },
+
+  "Results":{
+    "phone": "Téléphone",
+    "email": "Email"
+  }
+}

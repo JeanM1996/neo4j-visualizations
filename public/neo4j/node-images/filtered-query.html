@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <title>Popoto Search</title>
+    <link rel="stylesheet" href="../../css/popoto.min.css">
+    <style>
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="ppt-body">
+
+<header class="ppt-header">
+</header>
+
+<section class="ppt-section-main">
+    <div class="ppt-section-header">
+        <span class="ppt-header-span">Graph</span> search
+    </div>
+
+    <div class="ppt-container-graph">
+        <nav id="popoto-taxonomy" class="ppt-taxo-nav">
+            <!-- Label/taxonomy filter will be generated here -->
+            <label>
+                <input type="checkbox" id="count" value="checkbox1">
+                Disable count
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="schema" value="checkbox2">
+                Use schema
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="filter" value="checkbox3">
+                Filter dataset
+            </label>
+            <hr>
+        </nav>
+        <div id="popoto-graph" class="ppt-div-graph">
+            <!-- Graph will be generated here-->
+        </div>
+    </div>
+
+    <div id="popoto-query" class="ppt-container-query">
+        <!-- Query viewer will be generated here -->
+    </div>
+
+    <div id="popoto-cypher" class="ppt-container-cypher">
+        <!-- Cypher query viewer will be generated here -->
+    </div>
+
+    <div class="ppt-section-header">
+        <!-- The total results count is updated with a listener defined below -->
+        RESULTS <span id="result-total-count" class="ppt-count"></span>
+    </div>
+
+    <div id="popoto-results" class="ppt-container-results">
+        <!-- Results will be generated here -->
+    </div>
+
+</section>
+
+
+<!-- Required scripts -->
+<script src="../../js/jquery-2.1.0.min.js" charset="utf-8"></script>
+<script src="../../js/d3.v3.min.js" charset="utf-8"></script>
+<script src="../../js/popoto.min.js" charset="utf-8"></script>
+<script>
+
+    // Schema of graph for the Person Label
+    var personSchema = {
+        label: "Person",
+        rel: [
+            {
+                label: "ACTED_IN",
+                node: {
+                    label: "Movie"
+                }
+            },
+            {
+                label: "DIRECTED",
+                node: {
+                    label: "Movie"
+                }
+            },
+            {
+                label: "PRODUCED",
+                node: {
+                    label: "Movie"
+                }
+            },
+            {
+                label: "WROTE",
+                node: {
+                    label: "Movie"
+                }
+            },
+            {
+                label: "REVIEWED",
+                node: {
+                    label: "Movie"
+                }
+            },
+            {
+                label: "FOLLOWS",
+                node: {
+                    label: "Person",
+                    rel: [
+                        {
+                            label: "REVIEWED",
+                            node: {
+                                label: "Movie"
+                            }
+                        },
+                        {
+                            label: "FOLLOWS",
+                            node: {
+                                label: "Person",
+                                rel: [
+                                    {
+                                        label: "REVIEWED",
+                                        node: {
+                                            label: "Movie"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    };
+
+    d3.select("#count").on("change", function () {
+        popoto.graph.DISABLE_COUNT = this.checked;
+        popoto.tools.reset();
+    });
+
+    d3.select("#schema").on("change", function () {
+        if (this.checked) {
+            popoto.provider.nodeProviders.Person.schema = personSchema;
+        } else {
+            delete popoto.provider.nodeProviders.Person.schema;
+        }
+        popoto.tools.reset();
+    });
+
+    d3.select("#filter").on("change", function () {
+        if (this.checked) {
+            popoto.provider.nodeProviders.Person.filterNodeCountQuery = filterQuery;
+            popoto.provider.nodeProviders.Person.filterNodeValueQuery = filterQuery;
+            popoto.provider.nodeProviders.Person.filterNodeRelationQuery = filterQuery;
+            popoto.provider.nodeProviders.Person.filterResultQuery = function (initialQuery) {
+                return filterQuery(null, initialQuery);
+            };
+
+            popoto.provider.nodeProviders.Movie.filterNodeCountQuery = filterQuery;
+            popoto.provider.nodeProviders.Movie.filterNodeValueQuery = filterQuery;
+            popoto.provider.nodeProviders.Movie.filterNodeRelationQuery = filterQuery;
+            popoto.provider.nodeProviders.Movie.filterResultQuery = function (initialQuery) {
+                return filterQuery(null, initialQuery);
+            };
+        } else {
+            popoto.provider.nodeProviders.Person.filterNodeCountQuery = unFilterQuery;
+            popoto.provider.nodeProviders.Person.filterNodeValueQuery = unFilterQuery;
+            popoto.provider.nodeProviders.Person.filterNodeRelationQuery = unFilterQuery;
+            popoto.provider.nodeProviders.Person.filterResultQuery = function (initialQuery) {
+                return unFilterQuery(null, initialQuery);
+            };
+            popoto.provider.nodeProviders.Movie.filterNodeCountQuery = unFilterQuery;
+            popoto.provider.nodeProviders.Movie.filterNodeValueQuery = unFilterQuery;
+            popoto.provider.nodeProviders.Movie.filterNodeRelationQuery = unFilterQuery;
+            popoto.provider.nodeProviders.Movie.filterResultQuery = function (initialQuery) {
+                return unFilterQuery(null, initialQuery);
+            };
+        }
+        popoto.tools.reset();
+    });
+
+    /**
+     * URL used to access Neo4j REST API to execute queries.
+     * Update this parameter to your running server instance.
+     *
+     * For more information on Neo4J REST API the documentation is available here: http://neo4j.com/docs/stable/rest-api-cypher.html
+     */
+    popoto.rest.CYPHER_URL = "http://www.popotojs.com/proxy.php";
+
+    /**
+     * Define the Label provider you need for your application.
+     * This configuration is mandatory and should contain at least all the labels you could find in your graph model.
+     *
+     * In this version only nodes with a label are supported.
+     *
+     * By default If no attributes are specified Neo4j internal ID will be used.
+     * These label provider configuration can be used to customize the node display in the graph.
+     * See www.popotojs.com or example for more details on available configuration options.
+     */
+    popoto.provider.nodeProviders = {
+        "Person": {
+            "returnAttributes": ["name", "born"],
+            "constraintAttribute": "name"
+        },
+        "Movie": {
+            "returnAttributes": ["title", "released", "tagline"],
+            "constraintAttribute": "title"
+        }
+    };
+
+    // Customize Query for every count nodes query in graph, unless this has been override in dedicated label
+    function filterQuery(node, initialQuery) {
+        var label = node ? node.label : "result";
+        // Will be called for every nodes
+        console.log("~~>filter " + label + " query");
+        // InitialQuery contains detailed info on the query that would have been generated
+        // See queryStatement below to see how the data can be reused
+        console.log("INITIAL QUERY: " + JSON.stringify(initialQuery));
+
+        // Create a prefilter query: ex only persons acted in the matrix movie
+        // the variable "person" must match the variable used for root node in initial query here
+        var prefilterQuery = "MATCH (person:Person)-[:ACTED_IN]->(m:Movie{title:'The Matrix'}) WITH person ";
+
+        // Merge or replace the query statement
+        var queryStatement = prefilterQuery + "MATCH " + initialQuery.matchElements.join(", ") + ((initialQuery.whereElements.length > 0) ? " WHERE " + initialQuery.whereElements.join(" AND ") : "") + " RETURN " + initialQuery.returnElements.join(", ");
+
+        // This would work too
+        // var queryStatement = prefilterQuery + initialQuery.statement;
+
+        // Query parameters are needed too in this example I could have added the constraint title:'The Matrix' in a parameter
+        var queryParameters = initialQuery.parameters;
+
+        // Return modified query statement with parameter both are mandatory
+        return {
+            statement: queryStatement,
+            parameters: queryParameters
+        }
+    }
+
+    function unFilterQuery(node, initialQuery) {
+        return initialQuery
+    }
+
+    /**
+     * Here a listener is used to retrieve the total results count and update the page accordingly.
+     * This listener will be called on every graph modification.
+     */
+    popoto.result.onTotalResultCount(function (count) {
+        document.getElementById("result-total-count").innerHTML = "(" + count + ")";
+    });
+
+    /**
+     * The number of results returned can be changed with the following parameter.
+     * Default value is 100.
+     *
+     * Note that in this current version no pagination mechanism is available in displayed results
+     */
+    //popoto.query.RESULTS_PAGE_SIZE = 100;
+
+
+    /**
+     * For this version, popoto.js has been generated with debug traces you can activate with the following properties:
+     * The value can be one in DEBUG, INFO, WARN, ERROR, NONE.
+     *
+     * With INFO level all the executed cypher query can be seen in the navigator console.
+     * Default is NONE
+     */
+    popoto.logger.LEVEL = popoto.logger.LogLevels.INFO;
+
+    /**
+     * Start popoto.js generation.
+     * The function requires the label to use as root element in the graph.
+     */
+    popoto.start("Person");
+</script>
+</body>
+</html>
