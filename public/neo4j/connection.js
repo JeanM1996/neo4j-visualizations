@@ -6,15 +6,20 @@ var getQueryString = function ( field, url ) {
     return string ? string[1] : null;
 };
 
-var rawurl = getQueryString("cyperurl") || "http://hobby-cinpcmhbgmcbgbkeddkomdpl.dbs.graphenedb.com:24789";
+
+var defaulturl = "db-ljovrmxu24s76s1jbphc.graphenedb.com:24780";
+var defaultuser = "app81968631-13521279694483497";
+var defaultpwd = "b.o70mLuaAUEUO.BA1vM10dsFOjtEKm";
+
+var rawurl = getQueryString("cyperurl") || defaulturl;
 
 var cypherurl = rawurl + "/db/data/transaction/commit";
-//alert(cypherurl);
-var cypheruid = getQueryString("cyperuid") || getQueryString("cyperusr") || "app78358662-9L8qxg";
-var cypherpwd = getQueryString("cyperpwd") || getQueryString("cyperusr") || "b.grELhdtxmu17.EgTwMT2CR8gp3pJ1";
+//  alert(cypherurl);
+var cypheruid = getQueryString("cyperuid") || getQueryString("cyperusr") || getQueryString("user") || defaultuser;
+var cypherpwd = getQueryString("cyperpwd") || getQueryString("pwd") || defaultpwd;
 
-var sfdcid = getQueryString("sfdcid") || "0013900001ZglUUAAZ";
-var sfdcorgid = getQueryString("sfdcorgid") || "00D390000005LxxEAE";
+var sfdcid = getQueryString("sfdcid") || getQueryString("id") || "0011I00000C3vFgQAJ";
+var sfdcorgid = getQueryString("sfdcorgid") || getQueryString("orgid") || "00D1I000003nRMaUAM";
 
 
 popoto.rest.CYPHER_URL = cypherurl;
